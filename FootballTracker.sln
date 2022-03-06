@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31205.134
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FootballTracker", "FootballTracker\FootballTracker.csproj", "{3E906848-0841-4D34-B37D-CF9841513DEE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FootballTracker", "FootballTracker\FootballTracker.csproj", "{3E906848-0841-4D34-B37D-CF9841513DEE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Utils", "Utils", "{7E20EDFB-45C3-4369-95E7-57E93FB832AF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rest", "Utils\Rest\Rest.csproj", "{EBB57EED-F3C6-4A39-B644-AFE2C31C25AE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,9 +19,16 @@ Global
 		{3E906848-0841-4D34-B37D-CF9841513DEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3E906848-0841-4D34-B37D-CF9841513DEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3E906848-0841-4D34-B37D-CF9841513DEE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EBB57EED-F3C6-4A39-B644-AFE2C31C25AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EBB57EED-F3C6-4A39-B644-AFE2C31C25AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EBB57EED-F3C6-4A39-B644-AFE2C31C25AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EBB57EED-F3C6-4A39-B644-AFE2C31C25AE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{EBB57EED-F3C6-4A39-B644-AFE2C31C25AE} = {7E20EDFB-45C3-4369-95E7-57E93FB832AF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {459860DD-AF16-4F8E-85EB-18D22A6618DF}

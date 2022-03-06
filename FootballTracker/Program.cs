@@ -4,6 +4,7 @@ using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Web;
+using Rest;
 
 namespace FootballTracker
 {
@@ -36,6 +37,8 @@ namespace FootballTracker
 
     class FootballAPI : IFootballAPI
     {
+        private readonly RestClient restClient = new RestClient();
+
         public void PrintTodayMatches(object obj)
         {
             Console.Clear();
@@ -64,31 +67,12 @@ namespace FootballTracker
 
         public string GetHTMLTodayMatches()
         {
-            CookieContainer cookieContainer = new CookieContainer();
-            GetRequest getRequest = new GetRequest("https://soccer365.ru/online/");
-            SavedRequestHeaders.GetHeaders1(getRequest);
-
-            //WebProxy proxy = new WebProxy("127.0.0.1:8888");
-            //getRequest.Proxy = proxy;
-
-            getRequest.Run(cookieContainer);
-
-            return getRequest.Response;
+            return restClient.GetStringAsync("https://soccer365.ru/online/").Result;
         }
 
         public string GetHTMLSearch(string value)
         {
-
-            CookieContainer cookieContainer = new CookieContainer();
-            string address = "https://soccer365.ru/?a=search&q=" + HttpUtility.UrlEncode(value);
-            GetRequest getRequest = new GetRequest(address);
-            SavedRequestHeaders.GetHeaders1(getRequest);
-
-            WebProxy proxy = new WebProxy("127.0.0.1:8888");
-            getRequest.Proxy = proxy;
-
-            getRequest.Run(cookieContainer);
-            return getRequest.Response;
+            return restClient.GetStringAsync("https://soccer365.ru/?a=search&q=" + HttpUtility.UrlEncode(value)).Result;
         }
 
         public void Search(string value, params SearchScope[] scope)
@@ -147,16 +131,7 @@ namespace FootballTracker
 
         public string GetHTMLClubInfo(int clubId)
         {
-            CookieContainer cookieContainer = new CookieContainer();
-            string address = $"https://soccer365.ru/clubs/{clubId}/";
-            GetRequest getRequest = new GetRequest(address);
-            SavedRequestHeaders.GetHeaders1(getRequest);
-
-            //WebProxy proxy = new WebProxy("127.0.0.1:8888");
-            //getRequest.Proxy = proxy;
-
-            getRequest.Run(cookieContainer);
-            return getRequest.Response;
+            return restClient.GetStringAsync($"https://soccer365.ru/clubs/{clubId}/").Result;
         }
 
         public void PrintClubInfo(int clubId)
@@ -229,20 +204,20 @@ namespace FootballTracker
         static void Main(string[] args)
         {
             FootballAPI footballAPI = new FootballAPI();
-            footballAPI.Search(Console.ReadLine());
+            //footballAPI.Search(Console.ReadLine());
 
 
             #region PrintTodayMatches
-            //while (true)
-            //{
-            //    TimerCallback tm = new TimerCallback(footballAPI.PrintTodayMatches);
-            //    Timer timer = new Timer(tm, null, 0, 30000);
-            //    if (Console.ReadKey(true).Key == ConsoleKey.Enter)
-            //    {
-            //        timer.Dispose();
-            //        return;
-            //    }
-            //}
+            while (true)
+            {
+                TimerCallback tm = new TimerCallback(footballAPI.PrintTodayMatches);
+                Timer timer = new Timer(tm, null, 0, 30000);
+                if (Console.ReadKey(true).Key == ConsoleKey.Enter)
+                {
+                    timer.Dispose();
+                    return;
+                }
+            }
             #endregion
 
             //footballAPI.PrintClubInfo(Console.ReadLine());
