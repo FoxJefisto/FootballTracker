@@ -9,6 +9,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Utils", "Utils", "{7E20EDFB
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rest", "Utils\Rest\Rest.csproj", "{EBB57EED-F3C6-4A39-B644-AFE2C31C25AE}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Api", "Api", "{2B37E1A0-89BC-4EA6-B61C-D496D9246402}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Soccer365", "Api\Soccer365\Soccer365.csproj", "{3FFE4A84-9257-4DCA-B982-806F57228EA1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,12 +27,17 @@ Global
 		{EBB57EED-F3C6-4A39-B644-AFE2C31C25AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EBB57EED-F3C6-4A39-B644-AFE2C31C25AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EBB57EED-F3C6-4A39-B644-AFE2C31C25AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3FFE4A84-9257-4DCA-B982-806F57228EA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3FFE4A84-9257-4DCA-B982-806F57228EA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3FFE4A84-9257-4DCA-B982-806F57228EA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3FFE4A84-9257-4DCA-B982-806F57228EA1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{EBB57EED-F3C6-4A39-B644-AFE2C31C25AE} = {7E20EDFB-45C3-4369-95E7-57E93FB832AF}
+		{3FFE4A84-9257-4DCA-B982-806F57228EA1} = {2B37E1A0-89BC-4EA6-B61C-D496D9246402}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {459860DD-AF16-4F8E-85EB-18D22A6618DF}

@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Web;
 using Rest;
+using Soccer365;
 
 namespace FootballTracker
 {
@@ -38,31 +39,18 @@ namespace FootballTracker
     class FootballAPI : IFootballAPI
     {
         private readonly RestClient restClient = new RestClient();
+        private readonly Soccer365Api api = new Soccer365Api();
 
         public void PrintTodayMatches(object obj)
         {
             Console.Clear();
-            string htmlCode = GetHTMLTodayMatches();
-            string patternClubs = @"title=""([^""]* - [^""]*)"">";
-            string patternStartDate = @"""status"".*>([0-9А-Яа-я':.,\- ]+)<.*\/div>";
-            string patternScore = @"<div class=""gls"">([0-9\-]+)<\/div>";
-            Regex regexClubs = new Regex(patternClubs);
-            Regex regexStartDate = new Regex(patternStartDate);
-            Regex regexScore = new Regex(patternScore);
-            Match matchClubs = regexClubs.Match(htmlCode);
-            Match matchStartDate = regexStartDate.Match(htmlCode);
-            Match matchScore = regexScore.Match(htmlCode);
             Console.WriteLine(DateTime.Now.ToString("F"));
             Console.WriteLine(new string('-',25));
-            while (matchClubs.Success || matchStartDate.Success || matchScore.Success)
-            {
-                Console.Write($"{matchStartDate.Groups[1].Value,-20}{matchClubs.Groups[1].Value,50}{matchScore.Groups[1].Value,10}");
-                matchScore = matchScore.NextMatch();
-                Console.WriteLine($":{matchScore.Groups[1].Value}");
-                matchScore = matchScore.NextMatch();
-                matchClubs = matchClubs.NextMatch();
-                matchStartDate = matchStartDate.NextMatch();
-            }
+
+            var matches = api.GetTodayMatches();
+            matches.ForEach(
+                match => Console.WriteLine($"{match.StartDate,-20}{$"{match.ClubHome} - {match.ClubAway}",50}{match.Score,10}")
+            );
         }
 
         public string GetHTMLTodayMatches()
