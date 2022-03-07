@@ -1,9 +1,0 @@
-D:\VisualProjects\C#\6sem\FootballTracker\REST\bin\Debug\netcoreapp3.1\Rest.deps.json
-D:\VisualProjects\C#\6sem\FootballTracker\REST\bin\Debug\netcoreapp3.1\Rest.dll
-D:\VisualProjects\C#\6sem\FootballTracker\REST\bin\Debug\netcoreapp3.1\Rest.pdb
-D:\VisualProjects\C#\6sem\FootballTracker\REST\obj\Debug\netcoreapp3.1\Rest.csprojAssemblyReference.cache
-D:\VisualProjects\C#\6sem\FootballTracker\REST\obj\Debug\netcoreapp3.1\Rest.AssemblyInfoInputs.cache
-D:\VisualProjects\C#\6sem\FootballTracker\REST\obj\Debug\netcoreapp3.1\Rest.AssemblyInfo.cs
-D:\VisualProjects\C#\6sem\FootballTracker\REST\obj\Debug\netcoreapp3.1\Rest.csproj.CoreCompileInputs.cache
-D:\VisualProjects\C#\6sem\FootballTracker\REST\obj\Debug\netcoreapp3.1\Rest.dll
-D:\VisualProjects\C#\6sem\FootballTracker\REST\obj\Debug\netcoreapp3.1\Rest.pdb
