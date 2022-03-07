@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace FootballTracker
+namespace Soccer365.Models
 {
-    class FootballClubDetails : FootballClub
+    public class FootballClubDetails : FootballClub
     {
         public string FullName { get; private set; }
         public string City { get; private set; }
@@ -16,5 +16,4 @@ namespace FootballTracker
         public List<FootballMatchDetails> MatchResults { get; private set; }
 
     }
-
 }

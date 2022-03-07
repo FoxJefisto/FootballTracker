@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace FootballTracker
+namespace Soccer365.Models
 {
-    class Coach : Person
+    public class Coach : Person
     {
         public int CoachId { get; private set; }
         public string Club { get; private set; }

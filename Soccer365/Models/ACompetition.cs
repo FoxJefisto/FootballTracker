@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace FootballTracker
+namespace Soccer365.Models
 {
-    abstract class ACompetition
+    public abstract class ACompetition
     {
         public string Country { get; private set; }
         public DateTime DateStart { get; private set; }

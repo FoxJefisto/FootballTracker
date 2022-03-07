@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace FootballTracker
+namespace Soccer365.Models
 {
-    class Person
+    public class Person
     {
         public string FirstName { get; private set; }
         public string LastName { get; private set; }
