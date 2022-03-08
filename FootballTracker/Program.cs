@@ -14,9 +14,15 @@ namespace FootballTracker
         static void Main(string[] args)
         {
             Soccer365Api soccer365Api = new Soccer365Api();
-            DateTime date = DateTime.Parse(Console.ReadLine());
-            ListOfMatches todayMatches = soccer365Api.GetCustomDateMatches(date);
-            soccer365Api.PrintMatches(todayMatches);
+            ListOfMatches listOfMatches = soccer365Api.GetMatchesByDate(DateTime.Parse(Console.ReadLine()));
+            soccer365Api.PrintMatches(listOfMatches);
+            FootballClubDetails club = soccer365Api.GetClubInfoByName(Console.ReadLine());
+            soccer365Api.PrintClubInfo(club);
+            FootballPlayer player = soccer365Api.GetPlayerInfoByName(Console.ReadLine());
+            soccer365Api.PrintPlayerInfo(player);
+            Coach coach = soccer365Api.GetCoachInfoByName(Console.ReadLine());
+            soccer365Api.PrintCoachInfo(coach);
+
         }
     }
 }

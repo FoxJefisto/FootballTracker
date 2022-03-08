@@ -8,8 +8,4 @@
     <ProjectReference Include="..\REST\Rest.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Models\" />
-  </ItemGroup>
-
 </Project>

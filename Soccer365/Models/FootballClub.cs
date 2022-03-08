@@ -6,7 +6,7 @@ namespace Soccer365.Models
 {
     public class FootballClub
     {
-        public int? ClubId { get; private set; }
+        public string Id { get; private set; }
         public string Name { get; private set; }
         public FootballClub()
         {
@@ -16,11 +16,11 @@ namespace Soccer365.Models
         public FootballClub(string name)
         {
             Name = name;
-            ClubId = null;
+            Id = null;
         }
-        public FootballClub(int clubId, string name)
+        public FootballClub(string clubId, string name)
         {
-            ClubId = clubId;
+            Id = clubId;
             Name = name;
         }
     }
