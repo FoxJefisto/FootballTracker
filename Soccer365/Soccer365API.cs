@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using System.Web;
 using Soccer365.Models;
 using System.Linq;
+using System.Globalization;
 
 namespace Soccer365
 {
@@ -88,7 +89,7 @@ namespace Soccer365
             string patternClub = string.Format(@"href=""\/[{0}]+\/([0-9]+)\/"">([0-9А-Яа-я \-]+)<\/a>", scopesFilter);
             Regex regexClub = new Regex(patternClub);
             Match matchClub = regexClub.Match(htmlCode);
-            Dictionary<string, string> keyValues = new Dictionary<string,string>();
+            Dictionary<string, string> keyValues = new Dictionary<string, string>();
             while (matchClub.Success)
             {
                 keyValues.Add(matchClub.Groups[1].Value, matchClub.Groups[2].Value);
@@ -267,7 +268,7 @@ namespace Soccer365
         {
             Console.Clear();
             if (club.Id != null)
-                Console.WriteLine($"{"ID:", -21}{club.Id,-30}");
+                Console.WriteLine($"{"ID:",-21}{club.Id,-30}");
             if (club.Name != null)
                 Console.WriteLine($"{"Название:",-21}{club.Name,-30}");
             if (club.NameEnglish != null)
@@ -368,7 +369,7 @@ namespace Soccer365
                     matchKeyInfo = matchKeyInfo.NextMatch();
                     matchValueInfo = matchValueInfo.NextMatch();
                 }
-                player = new FootballPlayer(firstName, lastName, fullName, dateOfBirth, citizenship, 
+                player = new FootballPlayer(firstName, lastName, fullName, dateOfBirth, citizenship,
                     placeOfBirth, playerId, club, numberInClub, nationalTeam, numberInNatTeam, position, workingLeg, height, weight);
             }
             return player;
@@ -473,7 +474,7 @@ namespace Soccer365
                             placeOfBirth = valueInfo;
                             break;
                         case "Город рождения":
-                            placeOfBirth +=", " + valueInfo;
+                            placeOfBirth += ", " + valueInfo;
                             break;
                         case "Рост/вес":
                             matchHeightWeight = regexHeightWeight.Match(valueInfo);
@@ -523,6 +524,158 @@ namespace Soccer365
                 Console.WriteLine($"{"Рост:",-21}{coach.Height,-30}");
             if (coach.Weight != null)
                 Console.WriteLine($"{"Вес:",-21}{coach.Weight,-30}");
+        }
+        public Statistics GetMatchStatistics(string matchId)
+        {
+            Console.Clear();
+            string htmlCode = GetHTMLInfo(matchId, SearchScope.games);
+            string patternStatisticsKey = @"<div class=""stats_title"">([a-zA-ZА-Яа-я\-% ]+)";
+            string patternStatisticsValue = @"<div class=""stats_inf"">([0-9\.]+)<\/div>";
+            Regex regexStatisticsKey = new Regex(patternStatisticsKey);
+            Regex regexStatisticsValue = new Regex(patternStatisticsValue);
+            Match matchStatisticsKey = regexStatisticsKey.Match(htmlCode);
+            Match matchStatisticsValue = regexStatisticsValue.Match(htmlCode);
+            Statistics statistics = null;
+            Pair<float> xg = null;
+            Pair<int> shots, shotsOnTarget, shotsBlocked, saves, ballPossession, corners, fouls, offsides, yCards, rCards, attacks, attacksDangerous, passes, accPasses, freeKicks, prowing, crosses, tackles;
+            shots = shotsOnTarget = shotsBlocked = saves = ballPossession = corners = fouls = offsides = yCards = rCards = attacks = attacksDangerous = passes = accPasses = freeKicks = prowing = crosses = tackles = null;
+            while (matchStatisticsKey.Success || matchStatisticsValue.Success)
+            {
+                string valueInfo1 = matchStatisticsValue.Groups[1].Value.Trim();
+                matchStatisticsValue = matchStatisticsValue.NextMatch();
+                string valueInfo2 = matchStatisticsValue.Groups[1].Value.Trim();
+                switch (matchStatisticsKey.Groups[1].Value.Trim())
+                {
+                    case "xG":
+                        xg = new Pair<float>(float.Parse(valueInfo1, CultureInfo.InvariantCulture), float.Parse(valueInfo2, CultureInfo.InvariantCulture));
+                        break;
+                    case "Удары":
+                        shots = new Pair<int>(int.Parse(valueInfo1), int.Parse(valueInfo2));
+                        break;
+                    case "Удары в створ":
+                        shotsOnTarget = new Pair<int>(int.Parse(valueInfo1), int.Parse(valueInfo2));
+                        break;
+                    case "Блок-но ударов":
+                        shotsBlocked = new Pair<int>(int.Parse(valueInfo1), int.Parse(valueInfo2));
+                        break;
+                    case "Сейвы":
+                        saves = new Pair<int>(int.Parse(valueInfo1), int.Parse(valueInfo2));
+                        break;
+                    case "Владение %":
+                        ballPossession = new Pair<int>(int.Parse(valueInfo1), int.Parse(valueInfo2));
+                        break;
+                    case "Угловые":
+                        corners = new Pair<int>(int.Parse(valueInfo1), int.Parse(valueInfo2));
+                        break;
+                    case "Нарушения":
+                        fouls = new Pair<int>(int.Parse(valueInfo1), int.Parse(valueInfo2));
+                        break;
+                    case "Офсайды":
+                        offsides = new Pair<int>(int.Parse(valueInfo1), int.Parse(valueInfo2));
+                        break;
+                    case "Желтые карточки":
+                        yCards = new Pair<int>(int.Parse(valueInfo1), int.Parse(valueInfo2));
+                        break;
+                    case "Красные карточки":
+                        rCards = new Pair<int>(int.Parse(valueInfo1), int.Parse(valueInfo2));
+                        break;
+                    case "Атаки":
+                        attacks = new Pair<int>(int.Parse(valueInfo1), int.Parse(valueInfo2));
+                        break;
+                    case "Опасные атаки":
+                        attacksDangerous = new Pair<int>(int.Parse(valueInfo1), int.Parse(valueInfo2));
+                        break;
+                    case "Передачи":
+                        passes = new Pair<int>(int.Parse(valueInfo1), int.Parse(valueInfo2));
+                        break;
+                    case "Точность передач %":
+                        accPasses = new Pair<int>(int.Parse(valueInfo1), int.Parse(valueInfo2));
+                        break;
+                    case "Штрафные удары":
+                        freeKicks = new Pair<int>(int.Parse(valueInfo1), int.Parse(valueInfo2));
+                        break;
+                    case "Вбрасывания":
+                        prowing = new Pair<int>(int.Parse(valueInfo1), int.Parse(valueInfo2));
+                        break;
+                    case "Навесы":
+                        crosses = new Pair<int>(int.Parse(valueInfo1), int.Parse(valueInfo2));
+                        break;
+                    case "Отборы":
+                        tackles = new Pair<int>(int.Parse(valueInfo1), int.Parse(valueInfo2));
+                        break;
+
+                }
+                matchStatisticsKey = matchStatisticsKey.NextMatch();
+                matchStatisticsValue = matchStatisticsValue.NextMatch();
+            }
+            StatisticsStruct st = new StatisticsStruct()
+            {
+                xg = xg,
+                shots = shots,
+                shotsOnTarget = shotsOnTarget,
+                shotsBlocked = shotsBlocked,
+                saves = saves,
+                ballPossession = ballPossession,
+                corners = corners,
+                fouls = fouls,
+                offsides = offsides,
+                yCards = yCards,
+                rCards = rCards,
+                attacks = attacks,
+                attacksDangerous = attacksDangerous,
+                passes = passes,
+                accPasses = accPasses,
+                freeKicks = freeKicks,
+                prowing = prowing,
+                crosses = crosses,
+                tackles = tackles
+            };
+
+            statistics = new Statistics(matchId, st);
+            return statistics;
+        }
+
+        public void PrintMatchStatistics(Statistics st)
+        {
+            Console.Clear();
+            if (st.Id != null)
+                Console.WriteLine($"{"ID:",-21}{st.Id,-30}");
+            if (st.Xg != null)
+                Console.WriteLine($"{"xG:",-21}{st.Xg.OutPair(),-30}");
+            if (st.Shots != null)
+                Console.WriteLine($"{"Удары:",-21}{st.Shots.OutPair(),-30}");
+            if (st.ShotsOnTarget != null)
+                Console.WriteLine($"{"Удары в створ:",-21}{st.ShotsOnTarget.OutPair(),-30}");
+            if (st.ShotsBlocked != null)
+                Console.WriteLine($"{"Блок-но ударов:",-21}{st.ShotsBlocked.OutPair(),-30}");
+            if (st.Saves != null)
+                Console.WriteLine($"{"Сейвы:",-21}{st.Saves.OutPair(),-30}");
+            if (st.BallPossession != null)
+                Console.WriteLine($"{"Владение мячом %:",-21}{st.BallPossession.OutPair(),-30}");
+            if (st.Corners != null)
+                Console.WriteLine($"{"Угловые:",-21}{st.Corners.OutPair(),-30}");
+            if (st.Fouls != null)
+                Console.WriteLine($"{"Нарушения:",-21}{st.Fouls.OutPair(),-30}");
+            if (st.Offsides != null)
+                Console.WriteLine($"{"Оффсайды:",-21}{st.Offsides.OutPair(),-30}");
+            if (st.YCards != null)
+                Console.WriteLine($"{"Желтые карточки:",-21}{st.YCards.OutPair(),-30}");
+            if (st.RCards != null)
+                Console.WriteLine($"{"Красные карточки:",-21}{st.RCards.OutPair(),-30}");
+            if (st.Attacks != null)
+                Console.WriteLine($"{"Атаки:",-21}{st.Attacks.OutPair(),-30}");
+            if (st.AttacksDangerous != null)
+                Console.WriteLine($"{"Опасные атаки:",-21}{st.AttacksDangerous.OutPair(),-30}");
+            if (st.Passes != null)
+                Console.WriteLine($"{"Передачи:",-21}{st.Passes.OutPair(),-30}");
+            if (st.AccPasses != null)
+                Console.WriteLine($"{"Точность передач:",-21}{st.AccPasses.OutPair(),-30}");
+            if (st.FreeKicks != null)
+                Console.WriteLine($"{"Штрафные удары:",-21}{st.FreeKicks.OutPair(),-30}");
+            if (st.Prowing != null)
+                Console.WriteLine($"{"Вбрасывания:",-21}{st.Prowing.OutPair(),-30}");
+            if (st.Crosses != null)
+                Console.WriteLine($"{"Навесы:",-21}{st.Crosses.OutPair(),-30}");
         }
         public void PrintGameInfo(string gameId)
         {
