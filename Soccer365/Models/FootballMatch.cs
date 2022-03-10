@@ -43,7 +43,7 @@ namespace Soccer365.Models
         public string MatchId { get; private set; }
         public FootballClub ClubHome { get; private set; }
         public FootballClub ClubAway { get; private set; }
-        public String MatchStatus { get; private set; }
+        public string MatchStatus { get; private set; }
         public FootballClub Winner { get; private set; }
         public int? ClubHomeGoals { get; private set; }
         public int? ClubAwayGoals { get; private set; }

@@ -1,17 +1,17 @@
 ﻿using Rest;
+using Soccer365.Models;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web;
-using Soccer365.Models;
-using System.Linq;
-using System.Globalization;
 
 namespace Soccer365
 {
     public class Soccer365Api
     {
-        public enum SearchScope
+        private enum SearchScope
         {
             coaches,
             players,
@@ -369,8 +369,8 @@ namespace Soccer365
                     matchKeyInfo = matchKeyInfo.NextMatch();
                     matchValueInfo = matchValueInfo.NextMatch();
                 }
-                player = new FootballPlayer(firstName, lastName, fullName, dateOfBirth, citizenship,
-                    placeOfBirth, playerId, club, numberInClub, nationalTeam, numberInNatTeam, position, workingLeg, height, weight);
+                player = new FootballPlayer(playerId, firstName, lastName, fullName, dateOfBirth, citizenship,
+                    placeOfBirth, club, numberInClub, nationalTeam, numberInNatTeam, position, workingLeg, height, weight);
             }
             return player;
         }
@@ -485,7 +485,7 @@ namespace Soccer365
                     matchKeyInfo = matchKeyInfo.NextMatch();
                     matchValueInfo = matchValueInfo.NextMatch();
                 }
-                coach = new Coach(firstName, lastName, fullName, dateOfBirth, citizenship, placeOfBirth, coachId, club, height, weight);
+                coach = new Coach(coachId, firstName, lastName, fullName, dateOfBirth, citizenship, placeOfBirth, club, height, weight);
             }
             return coach;
         }
@@ -525,9 +525,9 @@ namespace Soccer365
             if (coach.Weight != null)
                 Console.WriteLine($"{"Вес:",-21}{coach.Weight,-30}");
         }
-        public Statistics GetMatchStatistics(string matchId)
+        //Сделано
+        public MatchStatistics GetMatchStatistics(string matchId)
         {
-            Console.Clear();
             string htmlCode = GetHTMLInfo(matchId, SearchScope.games);
             string patternStatisticsKey = @"<div class=""stats_title"">([a-zA-ZА-Яа-я\-% ]+)";
             string patternStatisticsValue = @"<div class=""stats_inf"">([0-9\.]+)<\/div>";
@@ -535,7 +535,7 @@ namespace Soccer365
             Regex regexStatisticsValue = new Regex(patternStatisticsValue);
             Match matchStatisticsKey = regexStatisticsKey.Match(htmlCode);
             Match matchStatisticsValue = regexStatisticsValue.Match(htmlCode);
-            Statistics statistics = null;
+            MatchStatistics statistics = null;
             Pair<float> xg = null;
             Pair<int> shots, shotsOnTarget, shotsBlocked, saves, ballPossession, corners, fouls, offsides, yCards, rCards, attacks, attacksDangerous, passes, accPasses, freeKicks, prowing, crosses, tackles;
             shots = shotsOnTarget = shotsBlocked = saves = ballPossession = corners = fouls = offsides = yCards = rCards = attacks = attacksDangerous = passes = accPasses = freeKicks = prowing = crosses = tackles = null;
@@ -608,7 +608,7 @@ namespace Soccer365
                 matchStatisticsKey = matchStatisticsKey.NextMatch();
                 matchStatisticsValue = matchStatisticsValue.NextMatch();
             }
-            StatisticsStruct st = new StatisticsStruct()
+            MatchStatisticsStruct st = new MatchStatisticsStruct()
             {
                 xg = xg,
                 shots = shots,
@@ -631,15 +631,12 @@ namespace Soccer365
                 tackles = tackles
             };
 
-            statistics = new Statistics(matchId, st);
+            statistics = new MatchStatistics(matchId, st);
             return statistics;
         }
-
-        public void PrintMatchStatistics(Statistics st)
+        //Сделано
+        public void PrintMatchStatistics(MatchStatistics st)
         {
-            Console.Clear();
-            if (st.Id != null)
-                Console.WriteLine($"{"ID:",-21}{st.Id,-30}");
             if (st.Xg != null)
                 Console.WriteLine($"{"xG:",-21}{st.Xg.OutPair(),-30}");
             if (st.Shots != null)
@@ -677,30 +674,219 @@ namespace Soccer365
             if (st.Crosses != null)
                 Console.WriteLine($"{"Навесы:",-21}{st.Crosses.OutPair(),-30}");
         }
-        public void PrintGameInfo(string gameId)
+        //Сделано
+        public MatchMainEvents GetMatchMainEvents(string gameId)
         {
-            Console.Clear();
             string htmlCode = GetHTMLInfo(gameId, SearchScope.games);
-            string patternClubs = @"var game_[ah]?t_title = '([0-9А-Яа-я \-]+)'";
-            string patternScore = @"<div class=""live_game_goal"">\s*<span>([0-9\-]+)<\/span>";
-            string patternEventsHome = @"<div class=""event_ht"">\s.*\s*(|<span class=""gray assist"".*\(([0-9А-Яа-я \-\.]+)\)<\/span>)\s.*>([0-9А-Яа-я \-]+)<\/a>.*""event_ht_icon live_([a-z]+)""><\/div>\s.*\s*<div class=""event_min"">([0-9]+)'<\/div>";
-            string patternEventsAway = @"<div class=""event_min"">([0-9]+)'<\/div>\s*<div class=""event_at"">\s*<div class=""event_at_icon live_([a-z]+)""><\/div>\s.*>([0-9А-Яа-я \-]+)<\/a><\/span><\/div>\s*(<span class=""gray assist"" title=""Ассистент"">\(([0-9А-Яа-я \-\.]+)\)|)";
-            Regex regexClubs = new Regex(patternClubs);
-            Regex regexScore = new Regex(patternScore);
+            string patternEventsHome = @"<div class=""event_ht"">\s.*\s*(|<span class=""gray assist"".*\(([0-9А-Яа-я \-\.]+)\)<\/span>)\s.*\/([0-9]+)\/"">([0-9А-Яа-я \-]+)<\/a>.*""event_ht_icon live_([a-z]+)""><\/div>\s.*\s*<div class=""event_min"">([0-9]+)'<\/div>";
+            string patternEventsAway = @"<div class=""event_min"">([0-9]+)'<\/div>\s*<div class=""event_at"">\s*<div class=""event_at_icon live_([a-z]+)""><\/div>\s.*\/([0-9]+)\/"">([0-9А-Яа-я \-]+)<\/a><\/span><\/div>\s*(<span class=""gray assist"" title=""Ассистент"">\(([0-9А-Яа-я \-\.]+)\)|)";
             Regex regexEventsHome = new Regex(patternEventsHome);
             Regex regexEventsAway = new Regex(patternEventsAway);
-            Match matchClubs = regexClubs.Match(htmlCode);
-            Match matchScore = regexScore.Match(htmlCode);
             Match matchEventHome = regexEventsHome.Match(htmlCode);
             Match matchEventAway = regexEventsAway.Match(htmlCode);
-            if (matchClubs.Success && matchScore.Success)
+            List<MatchMainEvent> eventsHome = new List<MatchMainEvent>();
+            List<MatchMainEvent> eventsAway = new List<MatchMainEvent>();
+            while (matchEventHome.Success)
             {
-                Console.WriteLine($"{matchClubs.Groups[1].Value,-30}{matchScore.Groups[1].Value,-3}:{matchScore.NextMatch().Groups[1].Value,3}{matchClubs.NextMatch().Groups[1].Value,30}");
-                while (matchEventHome.Success || matchEventAway.Success)
+                int minute = int.Parse(matchEventHome.Groups[6].Value);
+                string eventName = matchEventHome.Groups[5].Value;
+                string firstNameMain = matchEventHome.Groups[4].Value.Split(' ')[0];
+                string lastNameMain = string.Join(' ', matchEventHome.Groups[4].Value.Split(' ').Skip(1).ToArray());
+                string id = matchEventHome.Groups[3].Value;
+                Person mainAuthor = new Person(id,firstNameMain, lastNameMain);
+                Person secondAuthor = null;
+                if(matchEventHome.Groups[2].Value != "")
                 {
-
+                    string firstNameSecond = matchEventHome.Groups[2].Value.Split(' ')[0];
+                    string lastNameSecond = string.Join(' ', matchEventHome.Groups[2].Value.Split(' ').Skip(1).ToArray());
+                    secondAuthor = new Person(firstNameSecond, lastNameSecond);
+                }
+                MatchMainEvent matchMainEvent = new MatchMainEvent(TeamType.Home, minute, eventName, mainAuthor,secondAuthor);
+                eventsHome.Add(matchMainEvent);
+                matchEventHome = matchEventHome.NextMatch();
+            }
+            while (matchEventAway.Success)
+            {
+                int minute = int.Parse(matchEventAway.Groups[1].Value);
+                string eventName = matchEventAway.Groups[2].Value;
+                string id = matchEventAway.Groups[3].Value;
+                string firstNameMain = matchEventAway.Groups[4].Value.Split(' ')[0];
+                string lastNameMain = string.Join(' ', matchEventAway.Groups[4].Value.Split(' ').Skip(1).ToArray());
+                Person mainAuthor = new Person(id, firstNameMain, lastNameMain);
+                Person secondAuthor = null;
+                if (matchEventHome.Groups[6].Value != "")
+                {
+                    string firstNameSecond = matchEventAway.Groups[6].Value.Split(' ')[0];
+                    string lastNameSecond = string.Join(' ', matchEventAway.Groups[6].Value.Split(' ').Skip(1).ToArray());
+                    secondAuthor = new Person(firstNameSecond, lastNameSecond);
+                }
+                MatchMainEvent matchMainEvent = new MatchMainEvent(TeamType.Away, minute, eventName, mainAuthor, secondAuthor);
+                eventsAway.Add(matchMainEvent);
+                matchEventAway = matchEventAway.NextMatch();
+            }
+            MatchMainEvents mainEvents = new MatchMainEvents(gameId, eventsHome, eventsAway);
+            return mainEvents;
+        }
+        //Сделано
+        public void PrintMatchMainEvents(MatchMainEvents mainEvents)
+        {
+            foreach (var evnt in mainEvents.Events)
+            {
+                string str = "";
+                if (evnt.Team == TeamType.Home)
+                {
+                    if (evnt.SecondAuthor != null)
+                        str += $"({evnt.SecondAuthor.FirstName} {evnt.SecondAuthor.LastName}) ";
+                    str += $"{evnt.MainAuthor.FirstName + ' ' + evnt.MainAuthor.LastName} ";
+                    Console.WriteLine($"{str, -30} {evnt.Name, -15} {evnt.Minute, 2}");
+                }
+                if(evnt.Team == TeamType.Away)
+                {
+                    str += $" {evnt.MainAuthor.FirstName + ' ' + evnt.MainAuthor.LastName}";
+                    if (evnt.SecondAuthor != null)
+                        str += $" ({evnt.SecondAuthor.FirstName} {evnt.SecondAuthor.LastName})";
+                    Console.WriteLine($"{"",47}{evnt.Minute,-6} {evnt.Name,-15} {str,-30}");
                 }
             }
+        }
+        //Сделано
+        private Pair<List<MatchPlayer>> GetMatchStartSquad(string htmlCode)
+        {
+            int indexStartInfo = htmlCode.IndexOf("<div id=\"tm-lineup\">");
+            int indexEndInfo = htmlCode.IndexOf("<div id=\"tm-subst\"", indexStartInfo);
+            htmlCode = htmlCode.Substring(indexStartInfo, indexEndInfo - indexStartInfo);
+            string patternSquad = @"class=""сomposit_player"">\s*<a title=""([^""]+)""\s*href=""\/players\/([0-9]+)\/";
+            string patternNumber = @"<span class=""сomposit_num"">([0-9]+)<";
+            Regex regexSquad = new Regex(patternSquad);
+            Regex regexNumber = new Regex(patternNumber);
+            Match matchSquad = regexSquad.Match(htmlCode);
+            Match matchNumber = regexNumber.Match(htmlCode);
+            int k = 0;
+            const int MAX_START_PLAYERS = 11;
+            List<MatchPlayer> squadHome = new List<MatchPlayer>();
+            while ((matchSquad.Success || matchNumber.Success) && k < MAX_START_PLAYERS)
+            {
+                int number = int.Parse(matchNumber.Groups[1].Value);
+                string id = matchSquad.Groups[2].Value;
+                string firstNameMain = matchSquad.Groups[1].Value.Split(' ')[0];
+                string lastNameMain = string.Join(' ', matchSquad.Groups[1].Value.Split(' ').Skip(1).ToArray());
+                Person player = new Person(id, firstNameMain, lastNameMain);
+                squadHome.Add(new MatchPlayer(number, player));
+                matchNumber = matchNumber.NextMatch();
+                matchSquad = matchSquad.NextMatch();
+                k++;
+            }
+            k = 0;
+            List<MatchPlayer> squadAway = new List<MatchPlayer>();
+            while ((matchSquad.Success || matchNumber.Success) && k < MAX_START_PLAYERS)
+            {
+                int number = int.Parse(matchNumber.Groups[1].Value);
+                string id = matchSquad.Groups[2].Value;
+                string firstNameMain = matchSquad.Groups[1].Value.Split(' ')[0];
+                string lastNameMain = string.Join(' ', matchSquad.Groups[1].Value.Split(' ').Skip(1).ToArray());
+                Person player = new Person(id, firstNameMain, lastNameMain);
+                squadAway.Add(new MatchPlayer(number, player));
+                matchNumber = matchNumber.NextMatch();
+                matchSquad = matchSquad.NextMatch();
+                k++;
+            }
+            var startSquad = new Pair<List<MatchPlayer>>(squadHome, squadAway);
+            return startSquad;
+        }
+        //Сделано
+        private Pair<List<MatchPlayer>> GetMatchReservePlayers(string htmlCode)
+        {
+            int indexStartInfo = htmlCode.IndexOf("<div id=\"tm-subst\"");
+            int indexEndInfo = htmlCode.IndexOf("<div id=\"tm-players-position-view\"", indexStartInfo);
+            htmlCode = htmlCode.Substring(indexStartInfo, indexEndInfo - indexStartInfo);
+
+            indexStartInfo = htmlCode.IndexOf("class=\"сomposit_block\"");
+            indexEndInfo = htmlCode.IndexOf("<div class=\"сomposit_block\"", indexStartInfo);
+            string htmlCodeHome = htmlCode.Substring(indexStartInfo, indexEndInfo - indexStartInfo);
+
+            indexStartInfo = htmlCode.IndexOf("class=\"сomposit_block\"", indexStartInfo);
+            indexEndInfo = htmlCode.IndexOf("<div class=\"cl_both\"", indexStartInfo);
+            string htmlCodeAway = htmlCode.Substring(indexStartInfo, indexEndInfo - indexStartInfo);
+
+            indexStartInfo = htmlCodeHome.IndexOf("<tbody>");
+            indexEndInfo = htmlCodeHome.IndexOf("</tbody>", indexStartInfo);
+            htmlCodeHome = htmlCodeHome.Substring(indexStartInfo, indexEndInfo - indexStartInfo);
+
+            indexStartInfo = htmlCodeAway.IndexOf("<tbody>");
+            indexEndInfo = htmlCodeAway.IndexOf("</tbody>", indexStartInfo);
+            htmlCodeAway = htmlCodeAway.Substring(indexStartInfo, indexEndInfo - indexStartInfo);
+
+            string patternSquad = @"class=""сomposit_player"">\s*<a title=""([^""]+)""\s*href=""\/players\/([0-9]+)\/";
+            string patternNumber = @"<span class=""сomposit_num"">([0-9]+)<";
+            Regex regexSquad = new Regex(patternSquad);
+            Regex regexNumber = new Regex(patternNumber);
+            Match matchSquad = regexSquad.Match(htmlCodeHome);
+            Match matchNumber = regexNumber.Match(htmlCodeHome);
+            List<MatchPlayer> squadHome = new List<MatchPlayer>();
+            while (matchSquad.Success || matchNumber.Success)
+            {
+                int number = int.Parse(matchNumber.Groups[1].Value);
+                string id = matchSquad.Groups[2].Value;
+                string firstNameMain = matchSquad.Groups[1].Value.Split(' ')[0];
+                string lastNameMain = string.Join(' ', matchSquad.Groups[1].Value.Split(' ').Skip(1).ToArray());
+                Person player = new Person(id, firstNameMain, lastNameMain);
+                squadHome.Add(new MatchPlayer(number, player));
+                matchNumber = matchNumber.NextMatch();
+                matchSquad = matchSquad.NextMatch();
+            }
+            List<MatchPlayer> squadAway = new List<MatchPlayer>();
+            matchSquad = regexSquad.Match(htmlCodeAway);
+            matchNumber = regexNumber.Match(htmlCodeAway);
+            while ((matchSquad.Success || matchNumber.Success))
+            {
+                int number = int.Parse(matchNumber.Groups[1].Value);
+                string id = matchSquad.Groups[2].Value;
+                string firstNameMain = matchSquad.Groups[1].Value.Split(' ')[0];
+                string lastNameMain = string.Join(' ', matchSquad.Groups[1].Value.Split(' ').Skip(1).ToArray());
+                Person player = new Person(id, firstNameMain, lastNameMain);
+                squadAway.Add(new MatchPlayer(number, player));
+                matchNumber = matchNumber.NextMatch();
+                matchSquad = matchSquad.NextMatch();
+            }
+            var reservePlayers = new Pair<List<MatchPlayer>>(squadHome, squadAway);
+            return reservePlayers;
+        }
+        //Сделано
+        public MatchSquads GetMatchSquads(string gameId)
+        {
+            string htmlCode = GetHTMLInfo(gameId, SearchScope.games);
+            var startSquad = GetMatchStartSquad(htmlCode);
+            var reservePlayers = GetMatchReservePlayers(htmlCode);
+            var squads = new MatchSquads(startSquad, reservePlayers);
+            return squads;
+        }
+        //Сделано
+        public void PrintMatchSquads(MatchSquads squads)
+        {
+            Console.WriteLine($"{"Основной состав:",45}");
+            for(int i = 0; i < squads.StartSquad.HomeTeam.Count && i < squads.StartSquad.AwayTeam.Count; i++)
+            {
+                var playerHome = squads.StartSquad.HomeTeam[i];
+                var playerAway = squads.StartSquad.AwayTeam[i];
+                Console.WriteLine($"{playerHome.Number, -2} {playerHome.Player.FirstName + " " + playerHome.Player.LastName, -30} " + $"{"",20}" +
+                    $"{playerAway.Number,-2} {playerAway.Player.FirstName + " " + playerAway.Player.LastName,-30}");
+            }
+            Console.WriteLine($"{"Запасные игроки:",45}");
+            for (int i = 0; i < squads.ReservePlayers.HomeTeam.Count && i < squads.ReservePlayers.AwayTeam.Count; i++)
+            {
+                var playerHome = squads.ReservePlayers.HomeTeam[i];
+                var playerAway = squads.ReservePlayers.AwayTeam[i];
+                Console.WriteLine($"{playerHome.Number,-2} {playerHome.Player.FirstName + " " + playerHome.Player.LastName,-30} " + $"{"",20}" +
+                    $"{playerAway.Number,-2} {playerAway.Player.FirstName + " " + playerAway.Player.LastName,-30}");
+            }
+        }
+        //Сделано
+        public void PrintAllInfoMatch(MatchMainEvents events, MatchSquads squads, MatchStatistics statistics)
+        {
+            Console.WriteLine($"ID: {statistics.Id}");
+            PrintMatchMainEvents(events);
+            PrintMatchSquads(squads);
+            PrintMatchStatistics(statistics);
         }
     }
 }

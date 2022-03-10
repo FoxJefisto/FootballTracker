@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Soccer365.Models
 {
-    public struct StatisticsStruct
+    public struct MatchStatisticsStruct
     {
         public Pair<float> xg;
         public Pair<int> shots;
@@ -26,9 +26,9 @@ namespace Soccer365.Models
         public Pair<int> crosses;
         public Pair<int> tackles;
     }
-    public class Statistics
+    public class MatchStatistics
     {
-        public Statistics(string id, StatisticsStruct statistics)
+        public MatchStatistics(string id, MatchStatisticsStruct statistics)
         {
             Id = id;
             Xg = statistics.xg;
