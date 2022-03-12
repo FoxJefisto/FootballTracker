@@ -150,7 +150,7 @@ namespace Soccer365
                     clubAwayGoals = int.Parse(matchScore.Groups[1].Value);
                 else
                     clubAwayGoals = null;
-                FootballMatch footballMatch = new FootballMatch(matchId, clubHome, clubAway, matchStatus, clubHomeGoals, clubAwayGoals);
+                FootballMatch footballMatch = new FootballMatch(matchId, new Pair<FootballClub>(clubHome, clubAway), matchStatus, new Pair<int?>(clubHomeGoals, clubAwayGoals));
                 footballMatches.Add(footballMatch);
                 matchScore = matchScore.NextMatch();
                 matchClubs = matchClubs.NextMatch();
@@ -180,7 +180,7 @@ namespace Soccer365
             Console.WriteLine($"{listOfMatches.Date.ToString("d")}");
             foreach (var match in listOfMatches.footballMatches)
             {
-                Console.WriteLine($"{match.MatchStatus,-18}{match.ClubHome.Name,40}{"",6}{match.MatchScore,-10}{match.ClubAway.Name,-40}");
+                Console.WriteLine($"{match.MatchStatus,-18}{match.Clubs.HomeTeam.Name,40}{"",6}{match.MatchScore,-10}{match.Clubs.AwayTeam.Name,-40}");
             }
         }
         //Сделано
@@ -196,7 +196,7 @@ namespace Soccer365
             string name, englishName, fullName, mainCoach, stadium, city, country, foundationDate;
             name = englishName = fullName = mainCoach = stadium = city = country = foundationDate = null;
             int? rating = null;
-            List<Competition> competitions = new List<Competition>();
+            List<Competitions> competitions = new List<Competitions>();
             if (matchTitle.Success)
             {
                 string patternKeyInfo = @"<td class=""params_key[^""]*"">((?!Ссылки)[^<]+)";
@@ -236,7 +236,7 @@ namespace Soccer365
                         case "Соревнования":
                             while (matchValueInfo.Success)
                             {
-                                Competition competition = new Competition(matchValueInfo.Groups[1].Value.Trim());
+                                Competitions competition = new Competitions(matchValueInfo.Groups[1].Value.Trim());
                                 competitions.Add(competition);
                                 matchValueInfo = matchValueInfo.NextMatch();
                             }
@@ -861,6 +861,157 @@ namespace Soccer365
             return squads;
         }
         //Сделано
+        public Pair<Person> GetMatchCoaches(string gameId)
+        {
+            string htmlCode = GetHTMLInfo(gameId, SearchScope.games);
+            int indexStartInfo = htmlCode.IndexOf("Главный тренер");
+            int indexEndInfo = htmlCode.IndexOf("<table><tbody>", indexStartInfo);
+            htmlCode = htmlCode.Substring(indexStartInfo, indexEndInfo - indexStartInfo);
+            string patternCoaches = @"Главный тренер.*\/([^\/]+)\/"">([^<]+)<\/a><\/span>";
+            Regex regexCoaches = new Regex(patternCoaches);
+            Match matchCoaches = regexCoaches.Match(htmlCode);
+            Pair<Person> coaches = null;
+            if (matchCoaches.Success)
+            {
+                string id = matchCoaches.Groups[1].Value;
+                string firstName = matchCoaches.Groups[2].Value.Split(' ')[0];
+                string lastName = string.Join(' ', matchCoaches.Groups[2].Value.Split(' ').Skip(1).ToArray());
+                Person coachHome = new Person(id,firstName,lastName);
+                matchCoaches = matchCoaches.NextMatch();
+                id = matchCoaches.Groups[1].Value;
+                firstName = matchCoaches.Groups[2].Value.Split(' ')[0];
+                lastName = string.Join(' ', matchCoaches.Groups[2].Value.Split(' ').Skip(1).ToArray());
+                Person coachAway = new Person(id, firstName, lastName);
+                coaches = new Pair<Person>(coachHome,coachAway);
+            }
+            return coaches;
+        }
+        //Сделано
+        public List<Person> GetMatchReferee(string gameId)
+        {
+            string htmlCode = GetHTMLInfo(gameId, SearchScope.games);
+            int indexStartInfo = htmlCode.IndexOf("Арбитры");
+            int indexEndInfo = htmlCode.IndexOf("<div class=\"preview_item\">", indexStartInfo);
+            htmlCode = htmlCode.Substring(indexStartInfo, indexEndInfo - indexStartInfo);
+            string patternReferee = @"\/([^\/]+)\/"">([^<]+)<\/a><\/span>";
+            Regex regexReferee = new Regex(patternReferee);
+            Match matchReferee = regexReferee.Match(htmlCode);
+            List<Person> referee = new List<Person>();
+            while (matchReferee.Success)
+            {
+                string id = matchReferee.Groups[1].Value;
+                string firstName = matchReferee.Groups[2].Value.Split(' ')[0];
+                string lastName = string.Join(' ', matchReferee.Groups[2].Value.Split(' ').Skip(1).ToArray());
+                referee.Add(new Person(id, firstName, lastName));
+                matchReferee = matchReferee.NextMatch();
+            }
+            return referee;
+        }
+        //Сделано
+        public Stadiums GetMatchStadium(string gameId)
+        {
+            string htmlCode = GetHTMLInfo(gameId, SearchScope.games);
+            int indexStartInfo = htmlCode.IndexOf("Стадион");
+            int indexEndInfo = htmlCode.IndexOf("<div class=\"preview_item\">", indexStartInfo);
+            htmlCode = htmlCode.Substring(indexStartInfo, indexEndInfo - indexStartInfo);
+            string patternStadium = @"([^\/]+)\/"">([^<]+)<\/a><\/span><\/div>[^>]*>([^,]+), ([^<]+)";
+            string patternWeather = @">(.?[^°])°C.*>([^<]+)<\/span>";
+            Regex regexStadium = new Regex(patternStadium);
+            Regex regexWeather = new Regex(patternWeather);
+            Match matchStadium = regexStadium.Match(htmlCode);
+            Match matchWeather = regexWeather.Match(htmlCode);
+            Stadiums stadium = null;
+            if(matchStadium.Success || matchWeather.Success)
+            {
+                string id = matchStadium.Groups[1].Value;
+                string name = matchStadium.Groups[2].Value;
+                string city = matchStadium.Groups[3].Value;
+                string country = matchStadium.Groups[4].Value;
+                string temp = matchWeather.Groups[1].Value;
+                string weather = matchWeather.Groups[2].Value;
+                stadium = new Stadiums(id, name, city, country,temp, weather);
+            }
+            return stadium;
+        }
+        //Сделано
+        public int? GetMatchAttendance(string gameId)
+        {
+            string htmlCode = GetHTMLInfo(gameId, SearchScope.games);
+            string patternAttendance = @"Зрителей:<\/span>([^<]+)<";
+            Regex regexAttendance = new Regex(patternAttendance);
+            Match matchAttendance = regexAttendance.Match(htmlCode);
+            int? attendance = null;
+            if (matchAttendance.Success)
+            {
+                attendance = int.Parse(matchAttendance.Groups[1].Value.Replace(",", ""));
+            }
+            return attendance;
+        }
+        //Сделано
+        public Competitions GetMatchCompetition(string gameId)
+        {
+            string htmlCode = GetHTMLInfo(gameId, SearchScope.games);
+            string patternCompetition = @"\/competitions\/([^\/]+)\/"">([^<]+)<\/a>";
+            string patternStage = @"<h2>[^,]*, ([^,]+)";
+            Regex regexCompetition = new Regex(patternCompetition);
+            Regex regexStage = new Regex(patternStage);
+            Match matchCompetiton = regexCompetition.Match(htmlCode);
+            Match matchStage = regexStage.Match(htmlCode);
+            Competitions competition = null;
+            if (matchCompetiton.Success && matchStage.Success)
+            {
+                string id = matchCompetiton.Groups[1].Value;
+                string name = matchCompetiton.Groups[2].Value;
+                string currentStage = matchStage.Groups[1].Value;
+                competition = new Competitions(id, name, currentStage);
+            }
+            return competition;
+        }
+        //Не тестировалось
+        public FootballMatch GetMatchResults(string gameId)
+        {
+            string htmlCode = GetHTMLInfo(gameId, SearchScope.games);
+            string patternClubId = @"game_[h|a]t_id = ([^;]+)";
+            string patternClubName = @"game_[h|a]t_title = ([^;]+)";
+            string patternStatus = @".*, ([^<]+)<\/h2>";
+            string patternScore = @"live_game_goal"">\s*<span>[^<]+";
+            Regex regexClubId = new Regex(patternClubId);
+            Regex regexClubName = new Regex(patternClubName);
+            Regex regexStatus = new Regex(patternStatus);
+            Regex regexScore = new Regex(patternScore);
+            Match matchClubId = regexClubId.Match(htmlCode);
+            Match matchClubName = regexClubName.Match(htmlCode);
+            Match matchStatus = regexStatus.Match(htmlCode);
+            Match matchScore = regexScore.Match(htmlCode);
+            FootballMatch footballMatch = null;
+            if(matchClubId.Success && matchClubName.Success && matchStatus.Success && matchScore.Success)
+            {
+                string clubHomeId = matchClubId.Groups[1].Value;
+                string clubAwayId = matchClubId.Groups[2].Value;
+                string clubHomeName = matchClubName.Groups[1].Value;
+                string clubAwayName = matchClubName.Groups[2].Value;
+                FootballClub clubHome = new FootballClub(clubHomeId, clubHomeName);
+                FootballClub clubAway = new FootballClub(clubAwayId, clubAwayName);
+                string status = matchStatus.Groups[1].Value;
+                int? clubHomeGoals, clubAwayGoals;
+                if (matchScore.Groups[1].Value != "-")
+                    clubHomeGoals = int.Parse(matchScore.Groups[1].Value);
+                else
+                    clubHomeGoals = null;
+                matchScore = matchScore.NextMatch();
+                if (matchScore.Groups[1].Value != "-")
+                    clubAwayGoals = int.Parse(matchScore.Groups[1].Value);
+                else
+                    clubAwayGoals = null;
+                footballMatch = new FootballMatch(gameId, new Pair<FootballClub>(clubHome, clubAway), status, new Pair<int?>(clubHomeGoals, clubAwayGoals));
+                matchClubId = matchClubId.NextMatch();
+                matchClubName = matchClubName.NextMatch();
+                matchStatus = matchStatus.NextMatch();
+                matchScore = matchScore.NextMatch();
+            }
+            return footballMatch;
+        }
+        //Сделано
         public void PrintMatchSquads(MatchSquads squads)
         {
             Console.WriteLine($"{"Основной состав:",45}");
@@ -879,6 +1030,53 @@ namespace Soccer365
                 Console.WriteLine($"{playerHome.Number,-2} {playerHome.Player.FirstName + " " + playerHome.Player.LastName,-30} " + $"{"",20}" +
                     $"{playerAway.Number,-2} {playerAway.Player.FirstName + " " + playerAway.Player.LastName,-30}");
             }
+        }
+        //Сделано
+        public void PrintMatchCoaches(Pair<Person> coaches)
+        {
+            if (coaches != null)
+                Console.WriteLine($"{coaches.HomeTeam.FirstName + " " + coaches.HomeTeam.LastName,-33} " + $"{"",20}" +
+                    $"{coaches.AwayTeam.FirstName + " " + coaches.AwayTeam.LastName,-33}");
+        }
+        //Сделано
+        public void PrintMatchReferee(List<Person> referee)
+        {
+            foreach(var person in referee)
+            {
+                Console.WriteLine($"{person.FirstName + " " + person.LastName,-33}");
+            }
+        }
+        //Сделано
+        public void PrintMatchStadium(Stadiums stadium)
+        {
+            if (stadium.Name != null)
+                Console.WriteLine($"{"Название:",-21}{stadium.Name,-30}");
+            if (stadium.City != null)
+                Console.WriteLine($"{"Город:",-21}{stadium.City,-30}");
+            if (stadium.Country != null)
+                Console.WriteLine($"{"Страна:",-21}{stadium.Country,-30}");
+            if (stadium.Temp != null)
+                Console.WriteLine($"{"Температура:",-21}{stadium.Temp,-30}");
+            if (stadium.Weather != null)
+                Console.WriteLine($"{"Погода:",-21}{stadium.Weather,-30}");
+        }
+        //Сделано
+        public void PrintMatchAttendance(int? attendance)
+        {
+            if (attendance != null)
+                Console.WriteLine($"{"Посещаемость:",-21}{attendance,-30}");
+        }
+        //Сделано
+        public void PrintMatchCompetition(Competitions competition)
+        {
+            if (competition.Name != null)
+                Console.WriteLine($"{"Название:",-21}{competition.Name,-30}");
+            if (competition.CurrentStage != null)
+                Console.WriteLine($"{"Текущая стадия:",-21}{competition.CurrentStage,-30}");
+        }
+        //Недоделано
+        public void PrintMatchResults(FootballMatch match)
+        {
         }
         //Сделано
         public void PrintAllInfoMatch(MatchMainEvents events, MatchSquads squads, MatchStatistics statistics)

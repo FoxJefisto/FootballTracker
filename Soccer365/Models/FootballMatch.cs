@@ -7,14 +7,12 @@ namespace Soccer365.Models
     public class FootballMatch
     {
         public FootballMatch() { }
-        public FootballMatch(string matchId, FootballClub clubHome, FootballClub clubAway, string matchStatus, int? clubHomeGoals, int? clubAwayGoals)
+        public FootballMatch(string matchId, Pair<FootballClub> clubs, string matchStatus, Pair<int?> goals)
         {
             MatchId = matchId;
-            ClubHome = clubHome;
-            ClubAway = clubAway;
+            Clubs = clubs;
             MatchStatus = matchStatus;
-            ClubHomeGoals = clubHomeGoals;
-            ClubAwayGoals = clubAwayGoals;
+            Goals = goals;
             Winner = getWinner();
             MatchScore = getMatchScore();
         }
@@ -22,9 +20,9 @@ namespace Soccer365.Models
         private FootballClub getWinner()
         {
             FootballClub winner;
-            if (ClubHomeGoals.HasValue && ClubAwayGoals.HasValue)
+            if (Goals.HomeTeam.HasValue && Goals.AwayTeam.HasValue)
             {
-                winner = ClubHomeGoals > ClubAwayGoals ? ClubHome : ClubAway;
+                winner = Goals.HomeTeam > Goals.AwayTeam ? Clubs.HomeTeam : Clubs.AwayTeam;
             }
             else
                 winner = null;
@@ -34,19 +32,17 @@ namespace Soccer365.Models
         private string getMatchScore()
         {
             string score;
-            if (ClubHomeGoals.HasValue && ClubAwayGoals.HasValue)
-                score = ClubHomeGoals + " : " + ClubAwayGoals;
+            if (Goals.HomeTeam.HasValue && Goals.AwayTeam.HasValue)
+                score = Goals.HomeTeam + " : " + Goals.AwayTeam;
             else
                 score = "- : -";
             return score;
         }
         public string MatchId { get; private set; }
-        public FootballClub ClubHome { get; private set; }
-        public FootballClub ClubAway { get; private set; }
+        public Pair<FootballClub> Clubs { get; private set; }
         public string MatchStatus { get; private set; }
         public FootballClub Winner { get; private set; }
-        public int? ClubHomeGoals { get; private set; }
-        public int? ClubAwayGoals { get; private set; }
+        public Pair<int?> Goals { get; private set; }
         public string MatchScore { get; private set; }
     }
 }

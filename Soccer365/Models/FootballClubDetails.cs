@@ -6,7 +6,7 @@ namespace Soccer365.Models
 {
     public class FootballClubDetails : FootballClub
     {
-        public FootballClubDetails(string clubId, string name, string englishName,string fullName, string mainCoach, string stadium, string city, string country, string foundationDate, int? rating, List<Competition> competitions) : base(clubId, name)
+        public FootballClubDetails(string clubId, string name, string englishName,string fullName, string mainCoach, string stadium, string city, string country, string foundationDate, int? rating, List<Competitions> competitions) : base(clubId, name)
         {
             NameEnglish = englishName;
             FullName = fullName;
@@ -26,7 +26,7 @@ namespace Soccer365.Models
         public string Stadium { get; private set; }
         public string FoundationDate { get; private set; }
         public int? Rating { get; private set; }
-        public List<Competition> Competitions { get; private set; }
+        public List<Competitions> Competitions { get; private set; }
         //TODO: Добавить списки с последними результатами
         //public List<FootballMatchDetails> MatchShedule { get; private set; }
         //public List<FootballMatchDetails> MatchResults { get; private set; }
