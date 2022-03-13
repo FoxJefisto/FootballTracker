@@ -901,8 +901,7 @@ namespace Soccer365
             int indexStartInfo = htmlCode.IndexOf("Арбитры");
             if (indexStartInfo == -1)
                 return new List<Person>();
-            int indexEndInfo = htmlCode.IndexOf("<div class=\"preview_item\">", indexStartInfo);
-            htmlCode = htmlCode.Substring(indexStartInfo, indexEndInfo - indexStartInfo);
+            htmlCode = htmlCode.Substring(indexStartInfo);
             string patternReferee = @"\/([^\/]+)\/"">([^<]+)<\/a><\/span>";
             Regex regexReferee = new Regex(patternReferee);
             Match matchReferee = regexReferee.Match(htmlCode);

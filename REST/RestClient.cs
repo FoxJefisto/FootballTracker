@@ -11,12 +11,13 @@ namespace Rest
 
         public RestClient()
         {
-            this.client = new HttpClient();
+            client = new HttpClient();
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.174 YaBrowser/22.1.5.810 Yowser/2.5 Safari/537.36");
         }
 
         public async Task<string> GetStringAsync(string uri)
         {
-            var result = await this.client.GetAsync(uri);
+            var result = await client.GetAsync(uri);
 
             if (!result.IsSuccessStatusCode)
             {
