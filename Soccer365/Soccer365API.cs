@@ -39,7 +39,7 @@ namespace Soccer365
         //Сделано
         private string GetHTMLInfo(string clubId, SearchScope scope)
         {
-            string address = $"https://soccer365.ru/{scope.ToString()}/{clubId}/";
+            string address = $"https://soccer365.ru/{scope}/{clubId}/";
 
             return restClient.GetStringAsync(address).Result;
         }
@@ -51,7 +51,6 @@ namespace Soccer365
             Match matchClubId = regexClubId.Match(htmlCode);
             return matchClubId.Groups[1].Value;
         }
-
         private string GetCoachId(string coach)
         {
             string htmlCode = GetHTMLSearch(coach);
@@ -60,7 +59,6 @@ namespace Soccer365
             Match matchClubId = regexClubId.Match(htmlCode);
             return matchClubId.Groups[1].Value;
         }
-
         private string GetPlayerId(string player)
         {
             string htmlCode = GetHTMLSearch(player);
@@ -178,9 +176,9 @@ namespace Soccer365
         {
             Console.Clear();
             Console.WriteLine($"{listOfMatches.Date.ToString("d")}");
-            foreach (var match in listOfMatches.footballMatches)
+            foreach (var match in listOfMatches.Matches)
             {
-                Console.WriteLine($"{match.MatchStatus,-18}{match.Clubs.HomeTeam.Name,40}{"",6}{match.MatchScore,-10}{match.Clubs.AwayTeam.Name,-40}");
+                Console.WriteLine($"{match.Status,-18}{match.Clubs.HomeTeam.Name,40}{"",6}{match.Score,-10}{match.Clubs.AwayTeam.Name,-40}");
             }
         }
         //Сделано
@@ -536,9 +534,9 @@ namespace Soccer365
             Match matchStatisticsKey = regexStatisticsKey.Match(htmlCode);
             Match matchStatisticsValue = regexStatisticsValue.Match(htmlCode);
             MatchStatistics statistics = null;
-            Pair<float> xg = null;
-            Pair<int> shots, shotsOnTarget, shotsBlocked, saves, ballPossession, corners, fouls, offsides, yCards, rCards, attacks, attacksDangerous, passes, accPasses, freeKicks, prowing, crosses, tackles;
-            shots = shotsOnTarget = shotsBlocked = saves = ballPossession = corners = fouls = offsides = yCards = rCards = attacks = attacksDangerous = passes = accPasses = freeKicks = prowing = crosses = tackles = null;
+            Pair<float> xg = null, accPasses = null;
+            Pair<int> shots, shotsOnTarget, shotsBlocked, saves, ballPossession, corners, fouls, offsides, yCards, rCards, attacks, attacksDangerous, passes, freeKicks, prowing, crosses, tackles;
+            shots = shotsOnTarget = shotsBlocked = saves = ballPossession = corners = fouls = offsides = yCards = rCards = attacks = attacksDangerous = passes = freeKicks = prowing = crosses = tackles = null;
             while (matchStatisticsKey.Success || matchStatisticsValue.Success)
             {
                 string valueInfo1 = matchStatisticsValue.Groups[1].Value.Trim();
@@ -589,7 +587,7 @@ namespace Soccer365
                         passes = new Pair<int>(int.Parse(valueInfo1), int.Parse(valueInfo2));
                         break;
                     case "Точность передач %":
-                        accPasses = new Pair<int>(int.Parse(valueInfo1), int.Parse(valueInfo2));
+                        accPasses = new Pair<float>(float.Parse(valueInfo1, CultureInfo.InvariantCulture), float.Parse(valueInfo2, CultureInfo.InvariantCulture));
                         break;
                     case "Штрафные удары":
                         freeKicks = new Pair<int>(int.Parse(valueInfo1), int.Parse(valueInfo2));
@@ -638,41 +636,41 @@ namespace Soccer365
         public void PrintMatchStatistics(MatchStatistics st)
         {
             if (st.Xg != null)
-                Console.WriteLine($"{"xG:",-21}{st.Xg.OutPair(),-30}");
+                Console.WriteLine($"{"xG:",-21}{st.Xg.OutPair()}");
             if (st.Shots != null)
-                Console.WriteLine($"{"Удары:",-21}{st.Shots.OutPair(),-30}");
+                Console.WriteLine($"{"Удары:",-21}{st.Shots.OutPair()}");
             if (st.ShotsOnTarget != null)
-                Console.WriteLine($"{"Удары в створ:",-21}{st.ShotsOnTarget.OutPair(),-30}");
+                Console.WriteLine($"{"Удары в створ:",-21}{st.ShotsOnTarget.OutPair()}");
             if (st.ShotsBlocked != null)
-                Console.WriteLine($"{"Блок-но ударов:",-21}{st.ShotsBlocked.OutPair(),-30}");
+                Console.WriteLine($"{"Блок-но ударов:",-21}{st.ShotsBlocked.OutPair()}");
             if (st.Saves != null)
-                Console.WriteLine($"{"Сейвы:",-21}{st.Saves.OutPair(),-30}");
+                Console.WriteLine($"{"Сейвы:",-21}{st.Saves.OutPair()}");
             if (st.BallPossession != null)
-                Console.WriteLine($"{"Владение мячом %:",-21}{st.BallPossession.OutPair(),-30}");
+                Console.WriteLine($"{"Владение мячом %:",-21}{st.BallPossession.OutPair()}");
             if (st.Corners != null)
-                Console.WriteLine($"{"Угловые:",-21}{st.Corners.OutPair(),-30}");
+                Console.WriteLine($"{"Угловые:",-21}{st.Corners.OutPair()}");
             if (st.Fouls != null)
-                Console.WriteLine($"{"Нарушения:",-21}{st.Fouls.OutPair(),-30}");
+                Console.WriteLine($"{"Нарушения:",-21}{st.Fouls.OutPair()}");
             if (st.Offsides != null)
-                Console.WriteLine($"{"Оффсайды:",-21}{st.Offsides.OutPair(),-30}");
+                Console.WriteLine($"{"Оффсайды:",-21}{st.Offsides.OutPair()}");
             if (st.YCards != null)
-                Console.WriteLine($"{"Желтые карточки:",-21}{st.YCards.OutPair(),-30}");
+                Console.WriteLine($"{"Желтые карточки:",-21}{st.YCards.OutPair()}");
             if (st.RCards != null)
-                Console.WriteLine($"{"Красные карточки:",-21}{st.RCards.OutPair(),-30}");
+                Console.WriteLine($"{"Красные карточки:",-21}{st.RCards.OutPair()}");
             if (st.Attacks != null)
-                Console.WriteLine($"{"Атаки:",-21}{st.Attacks.OutPair(),-30}");
+                Console.WriteLine($"{"Атаки:",-21}{st.Attacks.OutPair()}");
             if (st.AttacksDangerous != null)
-                Console.WriteLine($"{"Опасные атаки:",-21}{st.AttacksDangerous.OutPair(),-30}");
+                Console.WriteLine($"{"Опасные атаки:",-21}{st.AttacksDangerous.OutPair()}");
             if (st.Passes != null)
-                Console.WriteLine($"{"Передачи:",-21}{st.Passes.OutPair(),-30}");
+                Console.WriteLine($"{"Передачи:",-21}{st.Passes.OutPair()}");
             if (st.AccPasses != null)
-                Console.WriteLine($"{"Точность передач:",-21}{st.AccPasses.OutPair(),-30}");
+                Console.WriteLine($"{"Точность передач:",-21}{st.AccPasses.OutPair()}");
             if (st.FreeKicks != null)
-                Console.WriteLine($"{"Штрафные удары:",-21}{st.FreeKicks.OutPair(),-30}");
+                Console.WriteLine($"{"Штрафные удары:",-21}{st.FreeKicks.OutPair()}");
             if (st.Prowing != null)
-                Console.WriteLine($"{"Вбрасывания:",-21}{st.Prowing.OutPair(),-30}");
+                Console.WriteLine($"{"Вбрасывания:",-21}{st.Prowing.OutPair()}");
             if (st.Crosses != null)
-                Console.WriteLine($"{"Навесы:",-21}{st.Crosses.OutPair(),-30}");
+                Console.WriteLine($"{"Навесы:",-21}{st.Crosses.OutPair()}");
         }
         //Сделано
         public MatchMainEvents GetMatchMainEvents(string gameId)
@@ -738,22 +736,24 @@ namespace Soccer365
                     if (evnt.SecondAuthor != null)
                         str += $"({evnt.SecondAuthor.FirstName} {evnt.SecondAuthor.LastName}) ";
                     str += $"{evnt.MainAuthor.FirstName + ' ' + evnt.MainAuthor.LastName} ";
-                    Console.WriteLine($"{str, -30} {evnt.Name, -15} {evnt.Minute, 2}");
+                    Console.WriteLine($"{str, -29} {evnt.Name, -16} {evnt.Minute, 2}");
                 }
                 if(evnt.Team == TeamType.Away)
                 {
                     str += $" {evnt.MainAuthor.FirstName + ' ' + evnt.MainAuthor.LastName}";
                     if (evnt.SecondAuthor != null)
                         str += $" ({evnt.SecondAuthor.FirstName} {evnt.SecondAuthor.LastName})";
-                    Console.WriteLine($"{"",47}{evnt.Minute,-6} {evnt.Name,-15} {str,-30}");
+                    Console.WriteLine($"{"",47}{evnt.Minute,-7} {evnt.Name,-16} {str,-30}");
                 }
             }
         }
         //Сделано
         private Pair<List<MatchPlayer>> GetMatchStartSquad(string htmlCode)
         {
-            int indexStartInfo = htmlCode.IndexOf("<div id=\"tm-lineup\">");
-            int indexEndInfo = htmlCode.IndexOf("<div id=\"tm-subst\"", indexStartInfo);
+            int indexStartInfo = htmlCode.IndexOf("tm-lineup");
+            if (indexStartInfo == -1)
+                return new Pair<List<MatchPlayer>>(new List<MatchPlayer>(), new List<MatchPlayer>());
+            int indexEndInfo = htmlCode.IndexOf("tm-subst", indexStartInfo);
             htmlCode = htmlCode.Substring(indexStartInfo, indexEndInfo - indexStartInfo);
             string patternSquad = @"class=""сomposit_player"">\s*<a title=""([^""]+)""\s*href=""\/players\/([0-9]+)\/";
             string patternNumber = @"<span class=""сomposit_num"">([0-9]+)<";
@@ -796,7 +796,9 @@ namespace Soccer365
         //Сделано
         private Pair<List<MatchPlayer>> GetMatchReservePlayers(string htmlCode)
         {
-            int indexStartInfo = htmlCode.IndexOf("<div id=\"tm-subst\"");
+            int indexStartInfo = htmlCode.IndexOf("tm-subst");
+            if (indexStartInfo == -1)
+                return new Pair<List<MatchPlayer>>(new List<MatchPlayer>(), new List<MatchPlayer>());
             int indexEndInfo = htmlCode.IndexOf("<div id=\"tm-players-position-view\"", indexStartInfo);
             htmlCode = htmlCode.Substring(indexStartInfo, indexEndInfo - indexStartInfo);
 
@@ -804,7 +806,7 @@ namespace Soccer365
             indexEndInfo = htmlCode.IndexOf("<div class=\"сomposit_block\"", indexStartInfo);
             string htmlCodeHome = htmlCode.Substring(indexStartInfo, indexEndInfo - indexStartInfo);
 
-            indexStartInfo = htmlCode.IndexOf("class=\"сomposit_block\"", indexStartInfo);
+            indexStartInfo = htmlCode.IndexOf("class=\"сomposit_block\"", indexEndInfo);
             indexEndInfo = htmlCode.IndexOf("<div class=\"cl_both\"", indexStartInfo);
             string htmlCodeAway = htmlCode.Substring(indexStartInfo, indexEndInfo - indexStartInfo);
 
@@ -865,22 +867,28 @@ namespace Soccer365
         {
             string htmlCode = GetHTMLInfo(gameId, SearchScope.games);
             int indexStartInfo = htmlCode.IndexOf("Главный тренер");
+            if (indexStartInfo == -1)
+                return null;
             int indexEndInfo = htmlCode.IndexOf("<table><tbody>", indexStartInfo);
             htmlCode = htmlCode.Substring(indexStartInfo, indexEndInfo - indexStartInfo);
-            string patternCoaches = @"Главный тренер.*\/([^\/]+)\/"">([^<]+)<\/a><\/span>";
+            string patternCoaches = @"Главный тренер.*<span>(|.*\/([^\/]+)\/"">)([^<]+)<";
             Regex regexCoaches = new Regex(patternCoaches);
             Match matchCoaches = regexCoaches.Match(htmlCode);
             Pair<Person> coaches = null;
             if (matchCoaches.Success)
             {
-                string id = matchCoaches.Groups[1].Value;
-                string firstName = matchCoaches.Groups[2].Value.Split(' ')[0];
-                string lastName = string.Join(' ', matchCoaches.Groups[2].Value.Split(' ').Skip(1).ToArray());
+                string id = null;
+                if (matchCoaches.Groups[2].Success)
+                    id = matchCoaches.Groups[2].Value;
+                string firstName = matchCoaches.Groups[3].Value.Split(' ')[0];
+                string lastName = string.Join(' ', matchCoaches.Groups[3].Value.Split(' ').Skip(1).ToArray());
                 Person coachHome = new Person(id,firstName,lastName);
                 matchCoaches = matchCoaches.NextMatch();
-                id = matchCoaches.Groups[1].Value;
-                firstName = matchCoaches.Groups[2].Value.Split(' ')[0];
-                lastName = string.Join(' ', matchCoaches.Groups[2].Value.Split(' ').Skip(1).ToArray());
+                id = null;
+                if (matchCoaches.Groups[2].Success)
+                    id = matchCoaches.Groups[2].Value;
+                firstName = matchCoaches.Groups[3].Value.Split(' ')[0];
+                lastName = string.Join(' ', matchCoaches.Groups[3].Value.Split(' ').Skip(1).ToArray());
                 Person coachAway = new Person(id, firstName, lastName);
                 coaches = new Pair<Person>(coachHome,coachAway);
             }
@@ -891,6 +899,8 @@ namespace Soccer365
         {
             string htmlCode = GetHTMLInfo(gameId, SearchScope.games);
             int indexStartInfo = htmlCode.IndexOf("Арбитры");
+            if (indexStartInfo == -1)
+                return new List<Person>();
             int indexEndInfo = htmlCode.IndexOf("<div class=\"preview_item\">", indexStartInfo);
             htmlCode = htmlCode.Substring(indexStartInfo, indexEndInfo - indexStartInfo);
             string patternReferee = @"\/([^\/]+)\/"">([^<]+)<\/a><\/span>";
@@ -915,7 +925,7 @@ namespace Soccer365
             int indexEndInfo = htmlCode.IndexOf("<div class=\"preview_item\">", indexStartInfo);
             htmlCode = htmlCode.Substring(indexStartInfo, indexEndInfo - indexStartInfo);
             string patternStadium = @"([^\/]+)\/"">([^<]+)<\/a><\/span><\/div>[^>]*>([^,]+), ([^<]+)";
-            string patternWeather = @">(.?[^°])°C.*>([^<]+)<\/span>";
+            string patternWeather = @">([0-9\+\-]+)°C.*>([^<]+)<\/span>";
             Regex regexStadium = new Regex(patternStadium);
             Regex regexWeather = new Regex(patternWeather);
             Match matchStadium = regexStadium.Match(htmlCode);
@@ -967,14 +977,14 @@ namespace Soccer365
             }
             return competition;
         }
-        //Не тестировалось
-        public FootballMatch GetMatchResults(string gameId)
+        //Сделано
+        public FootballMatch GetMatchById(string gameId)
         {
             string htmlCode = GetHTMLInfo(gameId, SearchScope.games);
             string patternClubId = @"game_[h|a]t_id = ([^;]+)";
-            string patternClubName = @"game_[h|a]t_title = ([^;]+)";
+            string patternClubName = @"game_[h|a]t_title = '([^']+)'";
             string patternStatus = @".*, ([^<]+)<\/h2>";
-            string patternScore = @"live_game_goal"">\s*<span>[^<]+";
+            string patternScore = @"live_game_goal"">\s*<span>([^<]+)";
             Regex regexClubId = new Regex(patternClubId);
             Regex regexClubName = new Regex(patternClubName);
             Regex regexStatus = new Regex(patternStatus);
@@ -987,12 +997,17 @@ namespace Soccer365
             if(matchClubId.Success && matchClubName.Success && matchStatus.Success && matchScore.Success)
             {
                 string clubHomeId = matchClubId.Groups[1].Value;
-                string clubAwayId = matchClubId.Groups[2].Value;
+                matchClubId = matchClubId.NextMatch();
+                string clubAwayId = matchClubId.Groups[1].Value;
                 string clubHomeName = matchClubName.Groups[1].Value;
-                string clubAwayName = matchClubName.Groups[2].Value;
+                matchClubName = matchClubName.NextMatch();
+                string clubAwayName = matchClubName.Groups[1].Value;
                 FootballClub clubHome = new FootballClub(clubHomeId, clubHomeName);
                 FootballClub clubAway = new FootballClub(clubAwayId, clubAwayName);
-                string status = matchStatus.Groups[1].Value;
+                string status = null;
+                if (!Regex.IsMatch(matchStatus.Groups[1].Value, @"[0-9]+\.[0-9]+\.[0-9]+ [0-9]+:[0-9]+"))
+                    matchStatus = Regex.Match(htmlCode, @"""live_game_status""[^>]*>\s*<b>([^<]+)<\/b>");
+                status = matchStatus.Groups[1].Value;
                 int? clubHomeGoals, clubAwayGoals;
                 if (matchScore.Groups[1].Value != "-")
                     clubHomeGoals = int.Parse(matchScore.Groups[1].Value);
@@ -1004,39 +1019,49 @@ namespace Soccer365
                 else
                     clubAwayGoals = null;
                 footballMatch = new FootballMatch(gameId, new Pair<FootballClub>(clubHome, clubAway), status, new Pair<int?>(clubHomeGoals, clubAwayGoals));
-                matchClubId = matchClubId.NextMatch();
-                matchClubName = matchClubName.NextMatch();
-                matchStatus = matchStatus.NextMatch();
-                matchScore = matchScore.NextMatch();
             }
             return footballMatch;
         }
         //Сделано
+        public FootballMatchDetails GetMatchAllInfo(string gameId)
+        {
+            var match = GetMatchById(gameId);
+            var events = GetMatchMainEvents(gameId);
+            var competition = GetMatchCompetition(gameId);
+            var squads = GetMatchSquads(gameId);
+            var coaches = GetMatchCoaches(gameId);
+            var statistics = GetMatchStatistics(gameId);
+            var stadium = GetMatchStadium(gameId);
+            var attendance = GetMatchAttendance(gameId);
+            var refereeTeam = GetMatchReferee(gameId);
+            return new FootballMatchDetails(match, events, competition, squads, coaches, statistics, stadium, attendance, refereeTeam);
+        }
+        //Сделано
         public void PrintMatchSquads(MatchSquads squads)
         {
-            Console.WriteLine($"{"Основной состав:",45}");
+            Console.WriteLine($"{"Основной состав:",55}");
             for(int i = 0; i < squads.StartSquad.HomeTeam.Count && i < squads.StartSquad.AwayTeam.Count; i++)
             {
                 var playerHome = squads.StartSquad.HomeTeam[i];
                 var playerAway = squads.StartSquad.AwayTeam[i];
-                Console.WriteLine($"{playerHome.Number, -2} {playerHome.Player.FirstName + " " + playerHome.Player.LastName, -30} " + $"{"",20}" +
-                    $"{playerAway.Number,-2} {playerAway.Player.FirstName + " " + playerAway.Player.LastName,-30}");
+                Console.WriteLine($"{playerHome.Number + " " + playerHome.Player.FirstName + " " + playerHome.Player.LastName, 40} " + $"{"",14}" +
+                    $"{playerAway.Number + " " + playerAway.Player.FirstName + " " + playerAway.Player.LastName,-40}");
             }
-            Console.WriteLine($"{"Запасные игроки:",45}");
+            Console.WriteLine($"{"Запасные игроки:",55}");
             for (int i = 0; i < squads.ReservePlayers.HomeTeam.Count && i < squads.ReservePlayers.AwayTeam.Count; i++)
             {
                 var playerHome = squads.ReservePlayers.HomeTeam[i];
                 var playerAway = squads.ReservePlayers.AwayTeam[i];
-                Console.WriteLine($"{playerHome.Number,-2} {playerHome.Player.FirstName + " " + playerHome.Player.LastName,-30} " + $"{"",20}" +
-                    $"{playerAway.Number,-2} {playerAway.Player.FirstName + " " + playerAway.Player.LastName,-30}");
+                Console.WriteLine($"{playerHome.Number + " " + playerHome.Player.FirstName + " " + playerHome.Player.LastName,40} " + $"{"",14}" +
+                    $"{playerAway.Number + " " + playerAway.Player.FirstName + " " + playerAway.Player.LastName,-40}");
             }
         }
         //Сделано
         public void PrintMatchCoaches(Pair<Person> coaches)
         {
             if (coaches != null)
-                Console.WriteLine($"{coaches.HomeTeam.FirstName + " " + coaches.HomeTeam.LastName,-33} " + $"{"",20}" +
-                    $"{coaches.AwayTeam.FirstName + " " + coaches.AwayTeam.LastName,-33}");
+                Console.WriteLine($"{coaches.HomeTeam.FirstName + " " + coaches.HomeTeam.LastName,40} " + $"{"",14}" +
+                    $"{coaches.AwayTeam.FirstName + " " + coaches.AwayTeam.LastName,-40}");
         }
         //Сделано
         public void PrintMatchReferee(List<Person> referee)
@@ -1069,22 +1094,40 @@ namespace Soccer365
         //Сделано
         public void PrintMatchCompetition(Competitions competition)
         {
-            if (competition.Name != null)
-                Console.WriteLine($"{"Название:",-21}{competition.Name,-30}");
-            if (competition.CurrentStage != null)
-                Console.WriteLine($"{"Текущая стадия:",-21}{competition.CurrentStage,-30}");
-        }
-        //Недоделано
-        public void PrintMatchResults(FootballMatch match)
-        {
+            if (competition.Name != null && competition.CurrentStage != null)
+                Console.WriteLine($"{"",37}{competition.Name}, {competition.CurrentStage}");
         }
         //Сделано
-        public void PrintAllInfoMatch(MatchMainEvents events, MatchSquads squads, MatchStatistics statistics)
+        public void PrintMatch(FootballMatch match)
         {
-            Console.WriteLine($"ID: {statistics.Id}");
-            PrintMatchMainEvents(events);
-            PrintMatchSquads(squads);
-            PrintMatchStatistics(statistics);
+            if (match.Status != null)
+                Console.WriteLine($"{"",44}{match.Status}");
+            if (match.Clubs != null && match.Score != null)
+                Console.WriteLine($"{match.Clubs.HomeTeam.Name,40}{"",5}{match.Score,-10}{match.Clubs.AwayTeam.Name,-40}");
+        }
+        //Сделано
+        public void PrintMatchAllInfo(FootballMatchDetails match)
+        {
+            PrintMatchCompetition(match.Competition);
+            PrintMatch(match);
+            PrintMatchMainEvents(match.MainEvents);
+            Console.WriteLine();
+            PrintMatchSquads(match.Squads);
+            PrintMatchCoaches(match.Coaches);
+            Console.WriteLine("Статистика:");
+            PrintMatchStatistics(match.Statistics);
+            Console.WriteLine();
+            PrintMatchStadium(match.Stadium);
+            PrintMatchAttendance(match.Attendance);
+            Console.WriteLine();
+            Console.WriteLine("Судейская бригада:");
+            PrintMatchReferee(match.RefereeTeam);
+        }
+        public FootballMatch GetMatchByDateName(DateTime date, string name)
+        {
+            var matches = GetMatchesByDate(date);
+            var match = matches.Matches.Find((x) => { return x.Clubs.HomeTeam.Name.Contains(name) || x.Clubs.AwayTeam.Name.Contains(name); });
+            return match;
         }
     }
 }

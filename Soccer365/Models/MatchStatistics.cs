@@ -20,7 +20,7 @@ namespace Soccer365.Models
         public Pair<int> attacks;
         public Pair<int> attacksDangerous;
         public Pair<int> passes;
-        public Pair<int> accPasses;
+        public Pair<float> accPasses;
         public Pair<int> freeKicks;
         public Pair<int> prowing;
         public Pair<int> crosses;
@@ -66,7 +66,7 @@ namespace Soccer365.Models
         public Pair<int> Attacks { get; private set; }
         public Pair<int> AttacksDangerous { get; private set; }
         public Pair<int> Passes { get; private set; }
-        public Pair<int> AccPasses { get; private set; }
+        public Pair<float> AccPasses { get; private set; }
         public Pair<int> FreeKicks { get; private set; }
         public Pair<int> Prowing { get; private set; }
         public Pair<int> Crosses { get; private set; }

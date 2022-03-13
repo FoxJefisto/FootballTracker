@@ -4,38 +4,22 @@ using System.Text;
 
 namespace Soccer365.Models
 {
-    public struct MatchDetailsStruct
-    {
-        public string matchId;
-        public Pair<FootballClub> clubs;
-        public string matchStatus;
-        public Pair<int?> goals;
-        public Competitions competition;
-        public string stage;
-        public Stadiums stadium;
-        public int? attendance;
-        public List<Person> refereeTeam;
-        public MatchStatistics statistics;
-        public MatchMainEvents mainEvents;
-        public MatchSquads squads;
-        public Pair<Person> coaches;
-    }
     public class FootballMatchDetails : FootballMatch
     {
-        public FootballMatchDetails(MatchDetailsStruct st) : base(st.matchId, st.clubs, st.matchStatus, st.goals)
+        public FootballMatchDetails(FootballMatch match, MatchMainEvents mainEvents, Competitions competition, MatchSquads squads, 
+            Pair<Person> coaches, MatchStatistics statistics, Stadiums stadium, int? attendance,
+            List<Person> refereeTeam) : base(match.Id, match.Clubs, match.Status, match.Goals)
         {
-            Competition = st.competition;
-            Stage = st.stage;
-            Stadium = Stadium;
-            Attendance = st.attendance;
-            RefereeTeam = st.refereeTeam;
-            Statistics = st.statistics;
-            MainEvents = st.mainEvents;
-            Squads = st.squads;
-            Coaches = st.coaches;
+            Competition = competition;
+            Stadium = stadium;
+            Attendance = attendance;
+            RefereeTeam = refereeTeam;
+            Statistics = statistics;
+            MainEvents = mainEvents;
+            Squads = squads;
+            Coaches = coaches;
         }
         public Competitions Competition { get; private set; }
-        public string Stage { get; private set; }
         public int? Attendance { get; private set; }
         public Stadiums Stadium { get; private set; }
         public List<Person> RefereeTeam { get; private set; }

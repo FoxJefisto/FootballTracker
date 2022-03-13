@@ -9,12 +9,12 @@ namespace Soccer365.Models
         public FootballMatch() { }
         public FootballMatch(string matchId, Pair<FootballClub> clubs, string matchStatus, Pair<int?> goals)
         {
-            MatchId = matchId;
+            Id = matchId;
             Clubs = clubs;
-            MatchStatus = matchStatus;
+            Status = matchStatus;
             Goals = goals;
             Winner = getWinner();
-            MatchScore = getMatchScore();
+            Score = getMatchScore();
         }
 
         private FootballClub getWinner()
@@ -38,11 +38,11 @@ namespace Soccer365.Models
                 score = "- : -";
             return score;
         }
-        public string MatchId { get; private set; }
+        public string Id { get; private set; }
         public Pair<FootballClub> Clubs { get; private set; }
-        public string MatchStatus { get; private set; }
+        public string Status { get; private set; }
         public FootballClub Winner { get; private set; }
         public Pair<int?> Goals { get; private set; }
-        public string MatchScore { get; private set; }
+        public string Score { get; private set; }
     }
 }

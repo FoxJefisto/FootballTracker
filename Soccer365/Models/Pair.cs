@@ -15,7 +15,7 @@ namespace Soccer365.Models
         public T AwayTeam { get; private set; }
         public string OutPair()
         {
-            string result = $"{HomeTeam,-5} - {AwayTeam,5}";
+            string result = $"{HomeTeam,19}{"",14}{AwayTeam,-40}";
             return result;
         }
     }

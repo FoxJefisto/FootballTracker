@@ -9,9 +9,9 @@ namespace Soccer365.Models
         public ListOfMatches(DateTime date, List<FootballMatch> footballMatches)
         {
             Date = date;
-            this.footballMatches = footballMatches;
+            Matches = footballMatches;
         }
         public DateTime Date { get; private set; }
-        public List<FootballMatch> footballMatches=null;
+        public List<FootballMatch> Matches=null;
     }
 }
