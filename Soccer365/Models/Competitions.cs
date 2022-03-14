@@ -12,15 +12,18 @@ namespace Soccer365.Models
             Id = null;
             Name = name;
             CurrentStage = null;
+            Season = null;
         }
-        public Competitions(string id, string name, string currentStage)
+        public Competitions(string id, string name, string season, string currentStage = null)
         {
             Id = id;
             Name = name;
+            Season = season;
             CurrentStage = currentStage;
         }
         public string Id { get; private set; }
         public string Name { get; private set; }
+        public string Season { get; private set; }
         public string CurrentStage { get; private set; }
     }
 }

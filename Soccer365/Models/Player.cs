@@ -4,9 +4,9 @@ using System.Text;
 
 namespace Soccer365.Models
 {
-    public class FootballPlayer : PersonDetails
+    public class Player : PersonDetails
     {
-        public FootballPlayer(string id, string firstName, string lastName, string fullName,
+        public Player(string id, string firstName, string lastName, string fullName,
             DateTime? dateOfBirth, string citizenship, string placeOfBirth, 
             string club, int? numberInClub, string nationalTeam, int? numberInNatTeam,
             string position, string workingLeg, int? height, 

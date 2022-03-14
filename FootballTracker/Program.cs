@@ -14,12 +14,14 @@ namespace FootballTracker
         static void Main(string[] args)
         {
             Soccer365Api soccer365Api = new Soccer365Api();
-            Console.WriteLine("Укажите дату:");
-            DateTime date = DateTime.Parse(Console.ReadLine());
-            Console.WriteLine("Введите название команды: ");
-            var match = soccer365Api.GetMatchByDateName(date, Console.ReadLine());
-            var matchInfo = soccer365Api.GetMatchAllInfo(match.Id);
-            soccer365Api.PrintMatchAllInfo(matchInfo);
+            //Console.WriteLine("Укажите дату:");
+            //DateTime date = DateTime.Parse(Console.ReadLine());
+            //Console.WriteLine("Введите название команды: ");
+            //var match = soccer365Api.GetMatchByDateName(date, Console.ReadLine());
+            //var matchInfo = soccer365Api.GetMatchAllInfo(match.Id);
+            //soccer365Api.PrintMatchAllInfo(matchInfo);
+            var player = soccer365Api.GetPlayerStatisticsById("21875");
+            soccer365Api.PrintPlayerStatistics(player);
         }
     }
 }

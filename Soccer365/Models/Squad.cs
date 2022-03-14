@@ -6,9 +6,9 @@ namespace Soccer365.Models
 {
     public class Squad
     {
-        public List<FootballPlayer> Goalkeepers { get; private set; }
-        public List<FootballPlayer> Defenders { get; private set; }
-        public List<FootballPlayer> Midfielders { get; private set; }
-        public List<FootballPlayer> Attackers { get; private set; }
+        public List<Player> Goalkeepers { get; private set; }
+        public List<Player> Defenders { get; private set; }
+        public List<Player> Midfielders { get; private set; }
+        public List<Player> Attackers { get; private set; }
     }
 }

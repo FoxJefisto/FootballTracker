@@ -37,9 +37,9 @@ namespace Soccer365
             return restClient.GetStringAsync(address).Result;
         }
         //Сделано
-        private string GetHTMLInfo(string clubId, SearchScope scope)
+        private string GetHTMLInfo(string id, SearchScope scope)
         {
-            string address = $"https://soccer365.ru/{scope}/{clubId}/";
+            string address = $"https://soccer365.ru/{scope}/{id}/";
 
             return restClient.GetStringAsync(address).Result;
         }
@@ -293,7 +293,7 @@ namespace Soccer365
             }
         }
         //Сделано
-        private FootballPlayer GetPlayerInfo(string htmlCode, string playerId)
+        private Player GetPlayerInfo(string htmlCode, string playerId)
         {
             int indexStartInfo = htmlCode.IndexOf("<div class=\"profile_info new\">");
             int indexEndInfo = htmlCode.IndexOf("</tbody></table>", indexStartInfo);
@@ -301,7 +301,7 @@ namespace Soccer365
             string patternTitle = @"<h1 class=""profile_info_title red"">([0-9А-Яа-я \-]+)<\/h1>";
             Regex regexTitle = new Regex(patternTitle);
             Match matchTitle = regexTitle.Match(htmlCode);
-            FootballPlayer player = null;
+            Player player = null;
             string firstName, lastName, fullName, citizenship, placeOfBirth,
                 club, nationalTeam, position, workingLeg;
             firstName = lastName = fullName = citizenship = placeOfBirth = club = nationalTeam = position = workingLeg = null;
@@ -367,26 +367,26 @@ namespace Soccer365
                     matchKeyInfo = matchKeyInfo.NextMatch();
                     matchValueInfo = matchValueInfo.NextMatch();
                 }
-                player = new FootballPlayer(playerId, firstName, lastName, fullName, dateOfBirth, citizenship,
+                player = new Player(playerId, firstName, lastName, fullName, dateOfBirth, citizenship,
                     placeOfBirth, club, numberInClub, nationalTeam, numberInNatTeam, position, workingLeg, height, weight);
             }
             return player;
         }
         //Сделано
-        public FootballPlayer GetPlayerInfoById(string playerId)
+        public Player GetPlayerInfoById(string playerId)
         {
             string htmlCode = GetHTMLInfo(playerId, SearchScope.players);
             return GetPlayerInfo(htmlCode, playerId);
         }
         //Сделано
-        public FootballPlayer GetPlayerInfoByName(string name)
+        public Player GetPlayerInfoByName(string name)
         {
             string playerId = GetPlayerId(name);
             string htmlCode = GetHTMLInfo(playerId, SearchScope.players);
             return GetPlayerInfo(htmlCode, playerId);
         }
         //Сделано
-        public void PrintPlayerInfo(FootballPlayer player)
+        public void PrintPlayerInfo(Player player)
         {
             Console.Clear();
             if (player.Id != null)
@@ -972,7 +972,7 @@ namespace Soccer365
                 string id = matchCompetiton.Groups[1].Value;
                 string name = matchCompetiton.Groups[2].Value;
                 string currentStage = matchStage.Groups[1].Value;
-                competition = new Competitions(id, name, currentStage);
+                competition = new Competitions(id, name, null, currentStage);
             }
             return competition;
         }
@@ -1122,11 +1122,68 @@ namespace Soccer365
             Console.WriteLine("Судейская бригада:");
             PrintMatchReferee(match.RefereeTeam);
         }
+        //Сделано
         public FootballMatch GetMatchByDateName(DateTime date, string name)
         {
             var matches = GetMatchesByDate(date);
             var match = matches.Matches.Find((x) => { return x.Clubs.HomeTeam.Name.Contains(name) || x.Clubs.AwayTeam.Name.Contains(name); });
             return match;
+        }
+
+        public PlayerStatistics GetPlayerStatisticsById(string playerId)
+        {
+            string htmlCode = GetHTMLInfo(playerId, SearchScope.players);
+            int indexStartInfo = htmlCode.IndexOf("pl_stat_block");
+            if (indexStartInfo == -1)
+                return new PlayerStatistics(playerId, new List<RowPlayerStatistics>());
+            htmlCode = htmlCode.Substring(indexStartInfo);
+            Match matchCompetition = Regex.Match(htmlCode, @"competitions\/([^\/]+)\/(|([0-9\-]+)\/)"">.*>\s*([А-Яа-я\-\ 0-9\/]+)");
+            Match matchClubs = Regex.Match(htmlCode, @"clubs\/([^\/]+)\/"">([^<]+)");
+            Match matchStats = Regex.Match(htmlCode, @"<td class[^>]+>([^<]+)<\/td>");
+            List<RowPlayerStatistics> stats = new List<RowPlayerStatistics>();
+            while(matchCompetition.Success && matchClubs.Success)
+            {
+                FootballClub club = new FootballClub(matchClubs.Groups[1].Value, matchClubs.Groups[2].Value);
+                string season = null;
+                if (matchCompetition.Groups[3].Success)
+                    season = matchCompetition.Groups[3].Value;
+                Competitions competition = new Competitions(matchCompetition.Groups[1].Value, matchCompetition.Groups[4].Value, season);
+                int matches = int.Parse(matchStats.Groups[1].Value);
+                matchStats = matchStats.NextMatch();
+                int goals = int.Parse(matchStats.Groups[1].Value);
+                matchStats = matchStats.NextMatch();
+                int pengoals = int.Parse(matchStats.Groups[1].Value);
+                matchStats = matchStats.NextMatch();
+                int assists = int.Parse(matchStats.Groups[1].Value);
+                matchStats = matchStats.NextMatch();
+                int minutes = int.Parse(matchStats.Groups[1].Value);
+                matchStats = matchStats.NextMatch();
+                int inStartMatches = int.Parse(matchStats.Groups[1].Value);
+                matchStats = matchStats.NextMatch();
+                int inSubsMatches = int.Parse(matchStats.Groups[1].Value);
+                matchStats = matchStats.NextMatch();
+                int yellowCards = int.Parse(matchStats.Groups[1].Value);
+                matchStats = matchStats.NextMatch();
+                int yellowRedCards = int.Parse(matchStats.Groups[1].Value);
+                matchStats = matchStats.NextMatch();
+                int redCards = int.Parse(matchStats.Groups[1].Value);
+                matchStats = matchStats.NextMatch();
+                RowPlayerStatistics row = new RowPlayerStatistics(club, competition, matches, goals, pengoals, assists, minutes, inStartMatches, inSubsMatches, yellowCards, yellowRedCards, redCards);
+                stats.Add(row);
+                matchCompetition = matchCompetition.NextMatch();
+                matchClubs = matchClubs.NextMatch();
+            }
+            PlayerStatistics playerStatistics = new PlayerStatistics(playerId, stats);
+            return playerStatistics;
+        }
+        public void PrintPlayerStatistics(PlayerStatistics stats)
+        {
+            Console.WriteLine($"{"Команда", -30} {"Соревнование", -40} {"Игр", 3} {"Гол",3} {"Пен",3} {"Пер",3} {"Мин",4} {"ВСт",3} {"ВНз",3} {"ЖК",3} {"ЖКК",3} {"КК",3}");
+            foreach(var stat in stats.Statistics)
+            {
+                Console.WriteLine($"{stat.Club.Name,-30} {stat.Competition.Name,-40} {stat.Matches,3} {stat.Goals,3} {stat.PenGoals,3} {stat.Assists,3} {stat.Minutes,4} {stat.InStartMatches,3} " +
+                    $"{stat.InSubsMatches,3} {stat.YellowCards,3} {stat.YellowRedCards,3} {stat.RedCards,3}");
+            }
         }
     }
 }
