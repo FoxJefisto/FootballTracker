@@ -8,7 +8,7 @@ namespace Soccer365.Models
     {
         public PersonDetails(string id,string firstName, string lastName, string fullName, DateTime? dateOfBirth, string citizenship, string placeOfBirth) : base(id,firstName,lastName)
         {
-            FullName = fullName;
+            OriginalName = fullName;
             DateOfBirth = dateOfBirth;
             Age = GetAge(dateOfBirth);
             Citizenship = citizenship;
@@ -25,7 +25,7 @@ namespace Soccer365.Models
                 age++;
             return age;
         }
-        public string FullName { get; private set; }
+        public string OriginalName { get; private set; }
         public int? Age { get; private set; }
         public DateTime? DateOfBirth { get; private set; }
         public string Citizenship { get; private set; }

@@ -37,6 +37,11 @@ namespace Soccer365
 
             return restClient.GetStringAsync(address).Result;
         }
+        private string GetHTMLSearchCompetition()
+        {
+            string address = "https://soccer365.ru/competitions/";
+            return restClient.GetStringAsync(address).Result;
+        }
         //Сделано
         private string GetHTMLInfo(string id, SearchScope scope, string data = null)
         {
@@ -103,6 +108,16 @@ namespace Soccer365
             }
             else
                 return null;
+        }
+        public string GetCompetitionIdByName(string name, string country)
+        {
+            string htmlCode = GetHTMLSearchCompetition();
+            string patternCompId = string.Format(@"competitions\/([0-9]+)\/""[^А-Яа-я]+{0}"">\s*<[^<]+<[^<]+<span>{1}", country, name);
+            Match matchCompId = Regex.Match(htmlCode, patternCompId, RegexOptions.IgnoreCase);
+            string result = null;
+            if (matchCompId.Success)
+                result = matchCompId.Groups[1].Value;
+            return result;
         }
         //Сделано
         private Dictionary<string, string> Search(string value, params SearchScope[] scope)
@@ -457,8 +472,8 @@ namespace Soccer365
                 Console.WriteLine($"{"Имя:",-21}{player.FirstName,-30}");
             if (player.LastName != null)
                 Console.WriteLine($"{"Фамилия:",-21}{player.LastName,-30}");
-            if (player.FullName != null)
-                Console.WriteLine($"{"Полное имя:",-21}{player.FullName,-30}");
+            if (player.OriginalName != null)
+                Console.WriteLine($"{"Полное имя:",-21}{player.OriginalName,-30}");
             if (player.Club != null)
                 Console.WriteLine($"{"Клуб:",-21}{player.Club,-30}");
             if (player.NumberInClub != null)
@@ -572,8 +587,8 @@ namespace Soccer365
                 Console.WriteLine($"{"Имя:",-21}{coach.FirstName,-30}");
             if (coach.LastName != null)
                 Console.WriteLine($"{"Фамилия:",-21}{coach.LastName,-30}");
-            if (coach.FullName != null)
-                Console.WriteLine($"{"Полное имя:",-21}{coach.FullName,-30}");
+            if (coach.OriginalName != null)
+                Console.WriteLine($"{"Полное имя:",-21}{coach.OriginalName,-30}");
             if (coach.Club != null)
                 Console.WriteLine($"{"Команда:",-21}{coach.Club,-30}");
             if (coach.Citizenship != null)
@@ -1297,7 +1312,7 @@ namespace Soccer365
                 matchNumber = matchNumber.NextMatch();
                 matchHeightWeight = matchHeightWeight.NextMatch();
                 matchWorkingLeg = matchWorkingLeg.NextMatch();
-                indexStartInfo = indexEndInfo + 5;
+                indexStartInfo = indexEndInfo + 3;
             }
             return new Squad(clubId, players);
         }
@@ -1468,6 +1483,117 @@ namespace Soccer365
                 else
                     Console.Write($"{"",-3} ");
                 Console.WriteLine();
+            }
+        }
+        public CompetitionsDetails GetCompetitionDetailsById(string id, string season)
+        {
+            string htmlCode = GetHTMLInfo(id, SearchScope.competitions, season + "/");
+            int indexStartInfo = htmlCode.LastIndexOf("<tbody>");
+            int indexEndInfo = htmlCode.IndexOf("</tbody>", indexStartInfo);
+            htmlCode = htmlCode.Substring(indexStartInfo, indexEndInfo - indexStartInfo);
+            Match matchName = Regex.Match(htmlCode, @"profile_info_title red"" > ([^<] +)");
+            Match matchCountry = Regex.Match(htmlCode, @"<span>([^<]+)<\/span>");
+            Match matchDate = Regex.Match(htmlCode, @"<\/td><td>([0-9\.]+) - ([0-9\.]+)<\/td><\/tr>");
+            Match matchAttendance = Regex.Match(htmlCode, @"<\/td><td>([0-9]+)<\/td><\/tr>");
+            Match matchMatches = Regex.Match(htmlCode, @"<\/td><td>([0-9]+) из ([0-9]+)<\/td><\/tr>");
+            Match matchStage = Regex.Match(htmlCode, @"Стадия<\/td><[^>]+>([^<]+)");
+            string country = null, currentStage = null, name = null;
+            DateTime? dateStart = null, dateEnd = null;
+            int? attendance = null, matchesPlayed = null, matchesAll = null;
+            if (matchName.Success)
+                name = matchName.Groups[1].Value;
+            if (matchCountry.Success)
+                country = matchCountry.Groups[1].Value;
+            if (matchDate.Success)
+            {
+                dateStart = DateTime.Parse(matchDate.Groups[1].Value);
+                dateEnd = DateTime.Parse(matchDate.Groups[2].Value);
+            }
+            if (matchAttendance.Success)
+                attendance = int.Parse(matchAttendance.Groups[1].Value);
+            if (matchMatches.Success)
+            {
+                matchesPlayed = int.Parse(matchMatches.Groups[1].Value);
+                matchesAll = int.Parse(matchMatches.Groups[2].Value);
+            }
+            if (matchStage.Success)
+                currentStage = matchStage.Groups[1].Value;
+            CompetitionsDetails competitions = new CompetitionsDetails(id, name, season, currentStage, country, dateStart, dateEnd, attendance, matchesPlayed, matchesAll);
+            return competitions;
+        }
+        public CompetitionsDetails GetCompetitionsDetailsByName(string name, string country,string season)
+        {
+            string id = GetCompetitionIdByName(name, country);
+            return GetCompetitionDetailsById(id, season);
+        }
+        public CompetitionTable GetCompetitionTableById(string id, string season)
+        {
+            string htmlCode = GetHTMLInfo(id, SearchScope.competitions, season + "/");
+            int indexStartInfo = htmlCode.IndexOf("competition_table");
+            if (indexStartInfo == -1)
+                return new CompetitionTable();
+            int indexEndInfo = htmlCode.IndexOf("</table>");
+            htmlCode = htmlCode.Substring(indexStartInfo, indexEndInfo - indexStartInfo);
+            indexStartInfo = 0;
+            List<RowInCompetitionTable> table = new List<RowInCompetitionTable>();
+            while (htmlCode.IndexOf("<tr>", indexStartInfo) != -1)
+            {
+                indexStartInfo = htmlCode.IndexOf("<tr>", indexStartInfo);
+                indexEndInfo = htmlCode.IndexOf("</tr>", indexStartInfo);
+                string htmlCodeRow = htmlCode.Substring(indexStartInfo, indexEndInfo - indexStartInfo);
+                Match matchPosition = Regex.Match(htmlCodeRow, @"([0-9]+)<\/div><\/td>");
+                Match matchClub = Regex.Match(htmlCodeRow, @"href=""\/clubs\/([0-9]+)\/"">([^<]+)");
+                Match matchStats = Regex.Match(htmlCodeRow, @"<td class=""ctr"">([^<]+)<\/td>");
+                Match matchPoints = Regex.Match(htmlCodeRow, @">([0-9]+)(<\/b>|<\/span>)");
+                FootballClub club = null;
+                int position = default;
+                if (matchPosition.Success)
+                {
+                    position = int.Parse(matchPosition.Groups[1].Value);
+                }
+                if (matchClub.Success)
+                {
+                    string clubId = matchClub.Groups[1].Value,
+                        clubName = matchClub.Groups[2].Value;
+                    club = new FootballClub(clubId, clubName);
+                }
+                int[] sts = new int[7];
+                int i = 0;
+                while(matchStats.Success && i<7)
+                {
+                    sts[i]= int.Parse(matchStats.Groups[1].Value);
+                    matchStats = matchStats.NextMatch();
+                    i++;
+                }
+                int points = default;
+                if (matchPoints.Success)
+                {
+                    points = int.Parse(matchPoints.Groups[1].Value);
+                }
+                RowInCompetitionTable row = new RowInCompetitionTable(position, club, sts[0], sts[1], sts[2], sts[3], sts[4], sts[5], sts[6], points);
+                table.Add(row);
+                indexStartInfo = indexEndInfo + 3;
+                matchClub = matchClub.NextMatch();
+                matchPoints = matchPoints.NextMatch();
+                matchPosition = matchPosition.NextMatch();
+            }
+            return new CompetitionTable(id, season, table);
+        }
+        //UNDONE: поддерживает только основные чемпионаты
+        public CompetitionTable GetCompetitionsTableByName(string name, string country, string season)
+        {
+            string id = GetCompetitionIdByName(name, country);
+            return GetCompetitionTableById(id, season);
+        }
+        public void PrintCompetitionTable(CompetitionTable table)
+        {
+            Console.WriteLine($"Id: {table.Id}");
+            Console.WriteLine($"Сезон: {table.Season}");
+            Console.WriteLine($"{"№",-4} {"Команда",-40} {"Игр",-4} {"Вгр",-4} {"Нч",-4} {"Прж",-4} {"Заб",-4} {"Прп",-4} {"+/-", -4} {"О", -4}");
+            foreach(var row in table.Table)
+            {
+                Console.WriteLine($"{row.Position,-4} {row.Club.Name,-40} {row.GamesPlayed,-4} {row.GamesWon,-4} {row.GamesDrawn,-4} {row.GamesLost,-4} {row.GoalsScored,-4} {row.GoalsMissed,-4} " +
+                    $"{row.GoalsDifference,-4} {row.Points,-4}");
             }
         }
     }
