@@ -4,28 +4,27 @@ using System.Text;
 
 namespace Soccer365.Models
 {
-    public class Player : PersonDetails
+    public class Player : Person
     {
-        public Player(string id, string firstName, string lastName, string fullName,
-            DateTime? dateOfBirth, string citizenship, string placeOfBirth, 
-            string club, int? numberInClub, string nationalTeam, int? numberInNatTeam,
-            string position, string workingLeg, int? height, 
-            int? weight) : base(id,firstName, lastName, fullName, dateOfBirth, citizenship, placeOfBirth)
+        public Player(FootballClub club,string id, string firstName, string lastName, int? number,
+            string position, int? age, DateTime? dateOfBirth, string workingLeg,
+            int? height, int? weight) : base(id, firstName, lastName)
         {
             Club = club;
-            NumberInClub = numberInClub;
-            NationalTeam = nationalTeam;
-            NumberInNatTeam = numberInNatTeam;
+            Number = number;
             Position = position;
+            Age = age;
+            DateOfBirth = dateOfBirth;
             WorkingLeg = workingLeg;
             Height = height;
             Weight = weight;
+
         }
-        public string Club { get; private set; }
-        public int? NumberInClub { get; private set; }
-        public string NationalTeam { get; private set; }
-        public int? NumberInNatTeam { get; private set; }
+        public FootballClub Club { get; private set; }
+        public int? Number { get; private set; }
+        public int? Age { get; private set; }
         public string Position { get; private set; }
+        public DateTime? DateOfBirth { get; private set; }
         public string WorkingLeg { get; private set; }
         public int? Height { get; private set; }
         public int? Weight { get; private set; }

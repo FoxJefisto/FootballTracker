@@ -8,10 +8,7 @@ namespace Soccer365.Models
     {
         public string Id { get; private set; }
         public string Name { get; private set; }
-        public FootballClub()
-        {
-
-        }
+        public FootballClub(){}
 
         public FootballClub(string name)
         {
