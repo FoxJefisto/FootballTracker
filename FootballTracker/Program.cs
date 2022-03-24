@@ -25,8 +25,8 @@ namespace FootballTracker
             //var match = soccer365Api.GetMatchByDateName(date, Console.ReadLine());
             //var matchInfo = soccer365Api.GetMatchAllInfo(match.Id);
             //soccer365Api.PrintMatchAllInfo(matchInfo);
-            var table = soccer365Api.GetCompetitionsTableByName(Console.ReadLine(), Console.ReadLine(), Console.ReadLine());
-            soccer365Api.PrintCompetitionTable(table);
+            //var grouptable = soccer365Api.GetCompetitionGroupTableById("19", "2012-2013");
+            //soccer365Api.PrintCompetitionGroupTable(grouptable);
         }
     }
 }
