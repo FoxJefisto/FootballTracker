@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -18,6 +19,9 @@ namespace TelegramBot
     public class Handlers
     {
         public static Soccer365Api soccer365 = new Soccer365Api();
+        public static Dictionary<string, string> dict = new Dictionary<string, string>() {
+            { "Матчи сегодня", "/getTodayMatches" }
+        };
         public static Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
         {
             var ErrorMessage = exception switch
@@ -64,46 +68,31 @@ namespace TelegramBot
             if (message.Type != MessageType.Text)
                 return;
 
+            if (dict.ContainsKey(message.Text))
+                message.Text = dict[message.Text];
+
             var action = (message.Text.Split(' ').First()) switch
             {
-                "/inline" => SendInlineKeyboard(botClient, message),
+                "/getTodayMatches" => GetTodayMatches(botClient, message),
                 "/keyboard" => SendReplyKeyboard(botClient, message),
                 "/remove" => RemoveKeyboard(botClient, message),
-                "/photo" => SendFile(botClient, message),
-                "/request" => RequestContactAndLocation(botClient, message),
                 _ => Usage(botClient, message)
             };
             var sentMessage = await action;
             Console.WriteLine($"The message was sent with id: {sentMessage.MessageId}");
 
-            // Send inline keyboard
-            // You can process responses in BotOnCallbackQueryReceived handler
-            static async Task<Message> SendInlineKeyboard(ITelegramBotClient botClient, Message message)
+            static async Task<Message> GetTodayMatches(ITelegramBotClient botClient, Message message)
             {
-                await botClient.SendChatActionAsync(message.Chat.Id, ChatAction.Typing);
-
-                // Simulate longer running task
-                await Task.Delay(500);
-
-                var inlineKeyboard = new InlineKeyboardMarkup(new[]
+                var table = soccer365.GetTodayMatches(20);
+                var groups = soccer365.PrintMatchesTG(table);
+                foreach (var group in groups)
                 {
-                    // first row
-                    new []
-                    {
-                        InlineKeyboardButton.WithCallbackData("Матчи сегодня", "GetTodayMatches()"),
-                        InlineKeyboardButton.WithCallbackData("1.2", "12"),
-                    },
-                    // second row
-                    //new []
-                    //{
-                    //    InlineKeyboardButton.WithCallbackData("2.1", "21"),
-                    //    InlineKeyboardButton.WithCallbackData("2.2", "22"),
-                    //},
-                });
-
+                    await botClient.SendTextMessageAsync(
+                    chatId: message.Chat.Id,
+                    text: $"{group}");
+                }
                 return await botClient.SendTextMessageAsync(chatId: message.Chat.Id,
-                                                            text: "Choose",
-                                                            replyMarkup: inlineKeyboard);
+                                                                text: "");
             }
 
             static async Task<Message> SendReplyKeyboard(ITelegramBotClient botClient, Message message)
@@ -111,8 +100,8 @@ namespace TelegramBot
                 var replyKeyboardMarkup = new ReplyKeyboardMarkup(
                     new KeyboardButton[][]
                     {
-                        new KeyboardButton[] { "1.1", "1.2" },
-                        new KeyboardButton[] { "2.1", "2.2" },
+                        new KeyboardButton[] { dict.ElementAt(0).Key },
+                        new KeyboardButton[] { "2.1" },
                     })
                 {
                     ResizeKeyboard = true
@@ -130,40 +119,12 @@ namespace TelegramBot
                                                             replyMarkup: new ReplyKeyboardRemove());
             }
 
-            static async Task<Message> SendFile(ITelegramBotClient botClient, Message message)
-            {
-                await botClient.SendChatActionAsync(message.Chat.Id, ChatAction.UploadPhoto);
-
-                const string filePath = @"Files/tux.png";
-                using FileStream fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-                var fileName = filePath.Split(Path.DirectorySeparatorChar).Last();
-
-                return await botClient.SendPhotoAsync(chatId: message.Chat.Id,
-                                                      photo: new InputOnlineFile(fileStream, fileName),
-                                                      caption: "Nice Picture");
-            }
-
-            static async Task<Message> RequestContactAndLocation(ITelegramBotClient botClient, Message message)
-            {
-                var RequestReplyKeyboard = new ReplyKeyboardMarkup(new[]
-                {
-                    KeyboardButton.WithRequestLocation("Location"),
-                    KeyboardButton.WithRequestContact("Contact"),
-                });
-
-                return await botClient.SendTextMessageAsync(chatId: message.Chat.Id,
-                                                            text: "Who or Where are you?",
-                                                            replyMarkup: RequestReplyKeyboard);
-            }
-
             static async Task<Message> Usage(ITelegramBotClient botClient, Message message)
             {
-                const string usage = "Usage:\n" +
-                                     "/inline   - send inline keyboard\n" +
-                                     "/keyboard - send custom keyboard\n" +
-                                     "/remove   - remove custom keyboard\n" +
-                                     "/photo    - send a photo\n" +
-                                     "/request  - request location or contact";
+                const string usage = "Доступные команды:\n" +
+                                     "/getTodayMatches   - send inline keyboard\n" +
+                                     "/keyboard          - send custom keyboard\n" +
+                                     "/remove            - remove custom keyboard\n";
 
                 return await botClient.SendTextMessageAsync(chatId: message.Chat.Id,
                                                             text: usage,
@@ -176,20 +137,23 @@ namespace TelegramBot
         {
             await botClient.AnswerCallbackQueryAsync(
                 callbackQueryId: callbackQuery.Id,
-                text: "");
-            string result = "";
+                text: $"");
             switch (callbackQuery.Data)
             {
                 case "GetTodayMatches()":
                     {
+                        string result = "";
                         var table = soccer365.GetTodayMatches();
-                        result = soccer365.PrintMatchesTG(table);
+                        var groups = soccer365.PrintMatchesTG(table);
+                        foreach(var group in groups)
+                        {
+                        await botClient.SendTextMessageAsync(
+                        chatId: callbackQuery.Message.Chat.Id,
+                        text: $"{group}");
+                        }
                     }
                     break;
             }
-            await botClient.SendTextMessageAsync(
-                chatId: callbackQuery.Message.Chat.Id,
-                text: $"{result}");
         }
 
         private static async Task BotOnInlineQueryReceived(ITelegramBotClient botClient, InlineQuery inlineQuery)

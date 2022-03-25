@@ -960,8 +960,9 @@ namespace Soccer365
                 }
             }
         }
-        public string PrintMatchesTG(ListOfMatches listOfMatches)
+        public List<string> PrintMatchesTG(ListOfMatches listOfMatches)
         {
+            var results = new List<string>();
             string result = $"{listOfMatches.Date.ToString("d")}\n";
             var competitions = from match in listOfMatches.Matches
                                group match by match.Competition;
@@ -970,10 +971,12 @@ namespace Soccer365
                 result += $"\n{competition.Key.Name} {competition.Key.Country}\n";
                 foreach (var match in competition)
                 {
-                    result += $"{match.Status,-18}{match.Clubs.HomeTeam.Name,40}{"",6}{match.Score,-10}{match.Clubs.AwayTeam.Name,-40}\n";
+                    result += $"{match.Status,-18}{match.Clubs.HomeTeam.Name,30}{"",6}{match.Score,-10}{match.Clubs.AwayTeam.Name,-30}\n";
                 }
+                results.Add(result);
+                result = "";
             }
-            return result;
+            return results;
         }
         public void PrintClubInfo(FootballClubDetails club)
         {
