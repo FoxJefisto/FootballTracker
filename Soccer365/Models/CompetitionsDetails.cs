@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Soccer365.Models
 {
@@ -44,7 +42,7 @@ namespace Soccer365.Models
                 result = CompetitionType.NotTables;
             return result;
         }
-        public string CurrentStage { get; set; } = null;
+        public string CurrentStage { get; set; }
         public DateTime? DateStart { get; private set; }
         public DateTime? DateEnd { get; private set; }
         public int? Attendance { get; private set; }

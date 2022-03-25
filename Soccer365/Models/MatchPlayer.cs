@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Soccer365.Models
+﻿namespace Soccer365.Models
 {
     public class MatchPlayer
     {
