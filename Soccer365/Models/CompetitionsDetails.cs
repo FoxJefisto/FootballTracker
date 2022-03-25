@@ -13,8 +13,9 @@ namespace Soccer365.Models
             NotTables
         }
         public CompetitionsDetails(string id, string name, string season, string currentStage, string country, DateTime? dateStart, DateTime? dateEnd,
-            int? attendance, int? matchesPlayed, int? matchesAll) : base(id, name, season, country, currentStage)
+            int? attendance, int? matchesPlayed, int? matchesAll) : base(id, name, country, season)
         {
+            CurrentStage = currentStage;
             DateStart = dateStart;
             DateEnd = dateEnd;
             Attendance = attendance;
@@ -43,6 +44,7 @@ namespace Soccer365.Models
                 result = CompetitionType.NotTables;
             return result;
         }
+        public string CurrentStage { get; set; } = null;
         public DateTime? DateStart { get; private set; }
         public DateTime? DateEnd { get; private set; }
         public int? Attendance { get; private set; }

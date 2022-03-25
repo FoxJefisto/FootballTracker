@@ -6,11 +6,11 @@ namespace Soccer365.Models
 {
     public class FootballMatchDetails : FootballMatch
     {
-        public FootballMatchDetails(FootballMatch match, MatchMainEvents mainEvents, Competitions competition, MatchSquads squads, 
+        public FootballMatchDetails(FootballMatch match, MatchMainEvents mainEvents, Competitions competition, string stage,MatchSquads squads, 
             Pair<Person> coaches, MatchStatistics statistics, Stadiums stadium, int? attendance,
-            List<Person> refereeTeam) : base(match.Id, match.Clubs, match.Status, match.Goals)
+            List<Person> refereeTeam) : base(match.Id, match.Competition, match.Stage, match.Clubs, match.Status, match.Goals)
         {
-            Competition = competition;
+
             Stadium = stadium;
             Attendance = attendance;
             RefereeTeam = refereeTeam;
@@ -19,7 +19,6 @@ namespace Soccer365.Models
             Squads = squads;
             Coaches = coaches;
         }
-        public Competitions Competition { get; private set; }
         public int? Attendance { get; private set; }
         public Stadiums Stadium { get; private set; }
         public List<Person> RefereeTeam { get; private set; }

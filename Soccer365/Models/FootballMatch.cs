@@ -7,9 +7,11 @@ namespace Soccer365.Models
     public class FootballMatch
     {
         public FootballMatch() { }
-        public FootballMatch(string matchId, Pair<FootballClub> clubs, string matchStatus, Pair<int?> goals)
+        public FootballMatch(string matchId, Competitions competition, string stage,Pair<FootballClub> clubs, string matchStatus, Pair<int?> goals)
         {
             Id = matchId;
+            Competition = competition;
+            Stage = stage;
             Clubs = clubs;
             Status = matchStatus;
             Goals = goals;
@@ -38,6 +40,8 @@ namespace Soccer365.Models
                 score = "- : -";
             return score;
         }
+        public Competitions Competition { get; private set; }
+        public string Stage { get; private set; }
         public string Id { get; private set; }
         public Pair<FootballClub> Clubs { get; private set; }
         public string Status { get; private set; }

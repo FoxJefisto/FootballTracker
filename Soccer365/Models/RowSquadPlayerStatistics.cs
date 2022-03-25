@@ -7,7 +7,7 @@ namespace Soccer365.Models
     public class RowSquadPlayerStatistics
     {
         public RowSquadPlayerStatistics(Person player, int? number, string position, int goals, int assists, 
-            int matches, int minutes, int goalPlusPass, int penGoals, int doubleGoals, int hatTricks, 
+            int matches, int minutes, int goalPlusPass, int penGoals, int doubleGoals, int hatTricks, int autoGoals,
             int yellowCards, int yellowRedCards, int redCards, int fairPlayScore)
         {
             Player = player;
@@ -21,6 +21,7 @@ namespace Soccer365.Models
             PenGoals = penGoals;
             DoubleGoals = doubleGoals;
             HatTricks = hatTricks;
+            AutoGoals = autoGoals;
             YellowCards = yellowCards;
             YellowRedCards = yellowRedCards;
             RedCards = redCards;
@@ -38,6 +39,7 @@ namespace Soccer365.Models
         public int PenGoals { get; private set; } = 0;
         public int DoubleGoals { get; private set; } = 0;
         public int HatTricks { get; private set; } = 0;
+        public int AutoGoals { get; private set; } = 0;
         public int YellowCards { get; private set; } = 0;
         public int YellowRedCards { get; private set; } = 0;
         public int RedCards { get; private set; } = 0;
