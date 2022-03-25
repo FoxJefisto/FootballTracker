@@ -1,0 +1,198 @@
+{
+  "format": 1,
+  "restore": {
+    "D:\\VisualProjects\\C#\\6sem\\FootballTracker\\TelegramBot\\TelegramBot.csproj": {}
+  },
+  "projects": {
+    "D:\\VisualProjects\\C#\\6sem\\FootballTracker\\REST\\Rest.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\VisualProjects\\C#\\6sem\\FootballTracker\\REST\\Rest.csproj",
+        "projectName": "Rest",
+        "projectPath": "D:\\VisualProjects\\C#\\6sem\\FootballTracker\\REST\\Rest.csproj",
+        "packagesPath": "C:\\Users\\Jefisto\\.nuget\\packages\\",
+        "outputPath": "D:\\VisualProjects\\C#\\6sem\\FootballTracker\\REST\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\Jefisto\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "netcoreapp3.1"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netcoreapp3.1": {
+            "targetAlias": "netcoreapp3.1",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "netcoreapp3.1": {
+          "targetAlias": "netcoreapp3.1",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.202\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "D:\\VisualProjects\\C#\\6sem\\FootballTracker\\Soccer365\\Soccer365.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\VisualProjects\\C#\\6sem\\FootballTracker\\Soccer365\\Soccer365.csproj",
+        "projectName": "Soccer365",
+        "projectPath": "D:\\VisualProjects\\C#\\6sem\\FootballTracker\\Soccer365\\Soccer365.csproj",
+        "packagesPath": "C:\\Users\\Jefisto\\.nuget\\packages\\",
+        "outputPath": "D:\\VisualProjects\\C#\\6sem\\FootballTracker\\Soccer365\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\Jefisto\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "netcoreapp3.1"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netcoreapp3.1": {
+            "targetAlias": "netcoreapp3.1",
+            "projectReferences": {
+              "D:\\VisualProjects\\C#\\6sem\\FootballTracker\\REST\\Rest.csproj": {
+                "projectPath": "D:\\VisualProjects\\C#\\6sem\\FootballTracker\\REST\\Rest.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "netcoreapp3.1": {
+          "targetAlias": "netcoreapp3.1",
+          "dependencies": {
+            "HtmlAgilityPack": {
+              "target": "Package",
+              "version": "[1.11.42, )"
+            },
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[13.0.1, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.202\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "D:\\VisualProjects\\C#\\6sem\\FootballTracker\\TelegramBot\\TelegramBot.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\VisualProjects\\C#\\6sem\\FootballTracker\\TelegramBot\\TelegramBot.csproj",
+        "projectName": "TelegramBot",
+        "projectPath": "D:\\VisualProjects\\C#\\6sem\\FootballTracker\\TelegramBot\\TelegramBot.csproj",
+        "packagesPath": "C:\\Users\\Jefisto\\.nuget\\packages\\",
+        "outputPath": "D:\\VisualProjects\\C#\\6sem\\FootballTracker\\TelegramBot\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\Jefisto\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "netcoreapp3.1"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netcoreapp3.1": {
+            "targetAlias": "netcoreapp3.1",
+            "projectReferences": {
+              "D:\\VisualProjects\\C#\\6sem\\FootballTracker\\Soccer365\\Soccer365.csproj": {
+                "projectPath": "D:\\VisualProjects\\C#\\6sem\\FootballTracker\\Soccer365\\Soccer365.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "netcoreapp3.1": {
+          "targetAlias": "netcoreapp3.1",
+          "dependencies": {
+            "Telegram.Bot": {
+              "target": "Package",
+              "version": "[16.0.0, )"
+            },
+            "Telegram.Bot.Extensions.Polling": {
+              "target": "Package",
+              "version": "[0.2.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.202\\RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

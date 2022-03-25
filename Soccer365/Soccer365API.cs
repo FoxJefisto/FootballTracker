@@ -960,6 +960,21 @@ namespace Soccer365
                 }
             }
         }
+        public string PrintMatchesTG(ListOfMatches listOfMatches)
+        {
+            string result = $"{listOfMatches.Date.ToString("d")}\n";
+            var competitions = from match in listOfMatches.Matches
+                               group match by match.Competition;
+            foreach (var competition in competitions)
+            {
+                result += $"\n{competition.Key.Name} {competition.Key.Country}\n";
+                foreach (var match in competition)
+                {
+                    result += $"{match.Status,-18}{match.Clubs.HomeTeam.Name,40}{"",6}{match.Score,-10}{match.Clubs.AwayTeam.Name,-40}\n";
+                }
+            }
+            return result;
+        }
         public void PrintClubInfo(FootballClubDetails club)
         {
             Console.Clear();

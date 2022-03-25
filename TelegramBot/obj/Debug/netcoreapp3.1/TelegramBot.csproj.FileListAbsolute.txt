@@ -1,0 +1,14 @@
+D:\VisualProjects\C#\6sem\FootballTracker\TelegramBot\bin\Debug\netcoreapp3.1\TelegramBot.deps.json
+D:\VisualProjects\C#\6sem\FootballTracker\TelegramBot\bin\Debug\netcoreapp3.1\TelegramBot.dll
+D:\VisualProjects\C#\6sem\FootballTracker\TelegramBot\bin\Debug\netcoreapp3.1\TelegramBot.pdb
+D:\VisualProjects\C#\6sem\FootballTracker\TelegramBot\bin\Debug\netcoreapp3.1\Rest.dll
+D:\VisualProjects\C#\6sem\FootballTracker\TelegramBot\bin\Debug\netcoreapp3.1\Soccer365.dll
+D:\VisualProjects\C#\6sem\FootballTracker\TelegramBot\bin\Debug\netcoreapp3.1\Soccer365.pdb
+D:\VisualProjects\C#\6sem\FootballTracker\TelegramBot\bin\Debug\netcoreapp3.1\Rest.pdb
+D:\VisualProjects\C#\6sem\FootballTracker\TelegramBot\obj\Debug\netcoreapp3.1\TelegramBot.csprojAssemblyReference.cache
+D:\VisualProjects\C#\6sem\FootballTracker\TelegramBot\obj\Debug\netcoreapp3.1\TelegramBot.AssemblyInfoInputs.cache
+D:\VisualProjects\C#\6sem\FootballTracker\TelegramBot\obj\Debug\netcoreapp3.1\TelegramBot.AssemblyInfo.cs
+D:\VisualProjects\C#\6sem\FootballTracker\TelegramBot\obj\Debug\netcoreapp3.1\TelegramBot.csproj.CoreCompileInputs.cache
+D:\VisualProjects\C#\6sem\FootballTracker\TelegramBot\obj\Debug\netcoreapp3.1\TelegramBot.csproj.CopyComplete
+D:\VisualProjects\C#\6sem\FootballTracker\TelegramBot\obj\Debug\netcoreapp3.1\TelegramBot.dll
+D:\VisualProjects\C#\6sem\FootballTracker\TelegramBot\obj\Debug\netcoreapp3.1\TelegramBot.pdb
